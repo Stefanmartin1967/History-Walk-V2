@@ -8,6 +8,7 @@ import { showAlert } from './modal.js';
 import { ANIMAL_RANKS } from './statistics.js';
 import { createIcons, icons } from 'lucide';
 import { uploadFileToGitHub, getStoredToken, saveToken } from './github-sync.js';
+import { initAdminControlCenter, openControlCenter } from './admin-control-center.js';
 
 export function initAdminMode() {
     // Initial check
@@ -20,7 +21,7 @@ export function initAdminMode() {
 
     setupAdminListeners();
     setupGodModeListener();
-    setupGitHubUploadUI(); // Setup the new UI logic
+    initAdminControlCenter(); // Setup the new Control Center logic
 }
 
 function toggleAdminUI(isAdmin) {
@@ -110,58 +111,30 @@ function setupAdminListeners() {
         btnRanks.parentNode.replaceChild(newBtn, btnRanks);
         newBtn.addEventListener('click', showRankTable);
 
-        // --- NOUVEAU : Bouton Upload GitHub ---
-        let btnGitHub = document.getElementById('btn-admin-github-upload');
-        if (!btnGitHub) {
-            btnGitHub = document.createElement('button');
-            btnGitHub.id = 'btn-admin-github-upload';
-            btnGitHub.className = 'tools-menu-item';
-            btnGitHub.innerHTML = `<i data-lucide="upload-cloud"></i> Upload Fichier`;
+        // --- CENTRE DE CONTRÔLE (Remplace les anciens boutons) ---
+        let btnControl = document.getElementById('btn-admin-control-center');
+        if (!btnControl) {
+            btnControl = document.createElement('button');
+            btnControl.id = 'btn-admin-control-center';
+            btnControl.className = 'tools-menu-item';
+            btnControl.style.color = 'var(--brand)';
+            btnControl.style.fontWeight = '600';
+            btnControl.innerHTML = `<i data-lucide="layout-dashboard"></i> Centre de Contrôle`;
 
             // Add at the end
-            menuContent.appendChild(btnGitHub);
-            createIcons({ icons, root: btnGitHub });
+            menuContent.appendChild(btnControl);
+            createIcons({ icons, root: btnControl });
         }
 
-        const newGitHubBtn = btnGitHub.cloneNode(true);
-        btnGitHub.parentNode.replaceChild(newGitHubBtn, btnGitHub);
-        newGitHubBtn.addEventListener('click', showGitHubUploadModal);
+        const newControlBtn = btnControl.cloneNode(true);
+        btnControl.parentNode.replaceChild(newControlBtn, btnControl);
+        newControlBtn.addEventListener('click', openControlCenter);
 
-        // --- NOUVEAU : Bouton Configuration GitHub (Token) ---
-        let btnConfig = document.getElementById('btn-admin-config-github');
-        if (!btnConfig) {
-            btnConfig = document.createElement('button');
-            btnConfig.id = 'btn-admin-config-github';
-            btnConfig.className = 'tools-menu-item';
-            btnConfig.innerHTML = `<i data-lucide="settings"></i> Config GitHub`;
-
-            // Add before Publish
-            menuContent.appendChild(btnConfig);
-            createIcons({ icons, root: btnConfig });
-        }
-
-        const newConfigBtn = btnConfig.cloneNode(true);
-        btnConfig.parentNode.replaceChild(newConfigBtn, btnConfig);
-        newConfigBtn.addEventListener('click', showGitHubConfigModal);
-
-        // --- NOUVEAU : Bouton Publier Carte (One-Click) ---
-        let btnPublish = document.getElementById('btn-admin-publish-map');
-        if (!btnPublish) {
-            btnPublish = document.createElement('button');
-            btnPublish.id = 'btn-admin-publish-map';
-            btnPublish.className = 'tools-menu-item';
-            btnPublish.style.color = 'var(--brand)';
-            btnPublish.style.fontWeight = '600';
-            btnPublish.innerHTML = `<i data-lucide="globe"></i> Publier Carte`;
-
-            // Add at the end
-            menuContent.appendChild(btnPublish);
-            createIcons({ icons, root: btnPublish });
-        }
-
-        const newPublishBtn = btnPublish.cloneNode(true);
-        btnPublish.parentNode.replaceChild(newPublishBtn, btnPublish);
-        newPublishBtn.addEventListener('click', publishMapToGitHub);
+        // Nettoyage des anciens boutons s'ils existent (Migration)
+        ['btn-admin-github-upload', 'btn-admin-config-github', 'btn-admin-publish-map'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        });
     }
 }
 
@@ -193,7 +166,7 @@ function setupGodModeListener() {
     });
 }
 
-function generateMasterGeoJSONData() {
+export function generateMasterGeoJSONData() {
     if (!state.loadedFeatures || state.loadedFeatures.length === 0) {
         return null;
     }
