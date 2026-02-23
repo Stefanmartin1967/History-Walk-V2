@@ -154,4 +154,30 @@ describe('Statistics System', () => {
         expect(stats.poiPercent).toBe(10);
         expect(stats.materialRank.title).toBe("Pierre");
     });
+
+    it('should exclude hidden POIs from total count', () => {
+        // Setup 10 POIs
+        state.loadedFeatures = Array.from({ length: 10 }, (_, i) => ({
+            properties: { HW_ID: `p${i}` }
+        }));
+
+        // Hide 2 POIs
+        state.hiddenPoiIds = ['p8', 'p9'];
+
+        // Visit 1 visible POI
+        state.userData['p0'] = { vu: true };
+        // Visit 1 hidden POI (should not count)
+        state.userData['p8'] = { vu: true };
+
+        const stats = calculateStats();
+
+        // Total should be 8 (10 - 2 hidden)
+        expect(stats.totalPois).toBe(8);
+
+        // Visited should be 1 (p0). p8 is hidden so it shouldn't count.
+        expect(stats.visitedPois).toBe(1);
+
+        // Percent: 1/8 = 12.5 -> 13%
+        expect(stats.poiPercent).toBe(13);
+    });
 });
