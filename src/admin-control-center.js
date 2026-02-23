@@ -1,12 +1,12 @@
 
 import { state } from './state.js';
 import { getPoiId, getPoiName } from './data.js';
-import { showAlert, showConfirm } from './modal.js';
+import { showAlert } from './modal.js';
 import { createIcons, icons } from 'lucide';
 import { generateMasterGeoJSONData } from './admin.js';
 import { uploadFileToGitHub, getStoredToken, saveToken } from './github-sync.js';
 import { showToast } from './toast.js';
-import { saveAppState, getAppState } from './database.js';
+import { saveAppState } from './database.js';
 
 // --- STATE MANAGEMENT ---
 
@@ -22,7 +22,6 @@ export async function initAdminControlCenter() {
     if (saved) {
         try {
             const parsed = JSON.parse(saved);
-            // Convert arrays back to Sets if needed, or just use arrays
             adminDraft = parsed;
             updateButtonBadge(); // Initialize badge on load
         } catch (e) {
@@ -30,127 +29,253 @@ export async function initAdminControlCenter() {
         }
     }
 
-    // Inject styles
+    // Inject styles (PC FIRST REDESIGN)
     const style = document.createElement('style');
     style.textContent = `
-        /* Layout & Typography */
-        .admin-cc-container { font-family: 'Inter', sans-serif; color: var(--ink); }
+        /* --- GLOBAL & LAYOUT (PC First) --- */
+        .admin-cc-container {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--ink);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-height: 80vh; /* Fixed height for modal content */
+        }
 
-        /* Tabs */
+        /* Modal Overrides for Admin Center */
+        /* Note: These target the generic modal container when active */
+        .custom-modal-content.admin-cc-mode {
+            max-width: 900px !important;
+            width: 90vw !important;
+            padding: 0 !important; /* Remove default padding to control scroll area */
+            border-radius: 16px;
+            overflow: hidden; /* Prevent outer scroll */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- HEADER & TABS (Segmented Control) --- */
+        .admin-cc-header {
+            padding: 20px 25px 0 25px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--line-light);
+            flex-shrink: 0; /* Don't shrink */
+        }
+
+        .admin-cc-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .admin-cc-tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
+            gap: 5px;
             background: var(--surface-muted);
-            padding: 5px;
-            border-radius: 12px;
+            padding: 4px;
+            border-radius: 10px;
+            width: fit-content;
+            margin-bottom: 20px;
         }
+
         .admin-cc-tab {
-            flex: 1;
-            padding: 10px 15px;
+            padding: 8px 24px;
             cursor: pointer;
             text-align: center;
             border-radius: 8px;
             font-weight: 600;
             font-size: 0.9em;
             color: var(--ink-soft);
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
         }
-        .admin-cc-tab:hover { background: rgba(0,0,0,0.05); color: var(--ink); }
+
+        .admin-cc-tab:hover {
+            color: var(--ink);
+            background: rgba(0,0,0,0.03);
+        }
+
         .admin-cc-tab.active {
             background: var(--surface);
             color: var(--brand);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transform: scale(1.02);
         }
 
-        /* Content Area */
-        .admin-cc-content {
-            min-height: 350px;
-            max-height: 65vh;
+        /* --- SCROLLABLE CONTENT AREA --- */
+        .admin-cc-scroll-area {
+            flex: 1; /* Take remaining height */
             overflow-y: auto;
-            padding-right: 5px; /* Space for scrollbar */
+            padding: 25px;
+            background: var(--bg); /* Slight contrast */
         }
 
-        /* Dashboard Grid */
+        /* --- DASHBOARD GRID (Glassmorphism) --- */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 20px;
+            margin-bottom: 30px;
         }
+
         .stat-card {
-            background: var(--surface);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--line);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 24px;
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-            transition: transform 0.2s;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
         }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .stat-icon { color: var(--brand); margin-bottom: 10px; }
-        .stat-value { font-size: 2.5em; font-weight: 800; color: var(--ink); line-height: 1; margin-bottom: 5px; }
-        .stat-label { color: var(--ink-soft); font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-        .stat-subtext { font-size: 0.75em; color: var(--ink-light); margin-top: 5px; }
 
-        /* Changes List */
-        .diff-item {
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-color: var(--brand-alpha);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--brand);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .stat-card:hover::before { opacity: 1; }
+
+        .stat-icon {
+            color: var(--brand);
+            margin-bottom: 12px;
+            background: var(--brand-light-alpha);
+            padding: 10px;
+            border-radius: 50%;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--ink);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: var(--ink-soft);
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+
+        /* --- SYNC BANNER --- */
+        .sync-banner {
+            background: linear-gradient(to right, #e3f2fd, #bbdefb);
+            border-left: 5px solid #2196f3;
+            color: #0d47a1;
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(33, 150, 243, 0.1);
+        }
+        .sync-banner i { flex-shrink: 0; margin-top: 3px; }
+
+        /* --- DIFF LIST (Side-by-Side) --- */
+        .diff-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .diff-card {
             background: var(--surface);
             border: 1px solid var(--line);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
-        .diff-header {
+
+        .diff-card-header {
+            background: var(--surface-muted);
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--line);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+        }
+
+        .diff-title { font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 10px; }
+        .diff-id {
+            font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+            font-size: 0.8em;
+            color: var(--ink-light);
+            background: rgba(0,0,0,0.05);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .diff-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+
+        .diff-table th {
+            text-align: left;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.02);
+            color: var(--ink-soft);
+            font-weight: 600;
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
+
+        .diff-table td {
+            padding: 12px 20px;
             border-bottom: 1px solid var(--line-light);
-            padding-bottom: 8px;
+            vertical-align: top;
         }
-        .diff-title { font-weight: 700; font-size: 1.05em; color: var(--ink); display: flex; align-items: center; gap: 8px; }
-        .diff-id { font-family: monospace; font-size: 0.75em; color: var(--ink-light); background: var(--surface-muted); padding: 2px 6px; border-radius: 4px; }
+        .diff-table tr:last-child td { border-bottom: none; }
 
-        .diff-row {
-            display: grid;
-            grid-template-columns: 100px 1fr 24px 1fr;
-            gap: 12px;
-            font-size: 0.9em;
-            align-items: center;
-            padding: 6px 0;
-            border-bottom: 1px dashed var(--line-light);
-        }
-        .diff-row:last-child { border-bottom: none; }
-        .diff-label { color: var(--ink-soft); font-weight: 600; font-size: 0.85em; text-transform: uppercase; }
-        .diff-old { color: var(--danger); text-decoration: line-through; opacity: 0.6; word-break: break-all; font-size: 0.9em; }
-        .diff-arrow { color: var(--ink-light); text-align: center; font-size: 0.8em; }
-        .diff-new { color: var(--ok); font-weight: 600; word-break: break-all; font-size: 0.95em; }
+        .diff-key { font-weight: 600; color: var(--ink-soft); width: 15%; }
+        .diff-old { color: var(--danger); text-decoration: line-through; opacity: 0.6; width: 35%; font-family: monospace; }
+        .diff-arrow { color: var(--ink-light); text-align: center; width: 10%; }
+        .diff-new { color: var(--ok); font-weight: 600; width: 35%; font-family: monospace; background: rgba(0,255,0,0.05); }
 
-        /* Settings */
-        .settings-panel { padding: 10px; }
+        /* --- SETTINGS --- */
         .settings-input {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             border: 1px solid var(--line);
             border-radius: 8px;
-            margin-bottom: 15px;
             font-family: monospace;
-            background: var(--surface-muted);
+            font-size: 1rem;
+            background: var(--surface);
             color: var(--ink);
+            transition: border 0.2s;
         }
-        .settings-input:focus { border-color: var(--brand); outline: none; background: var(--surface); }
+        .settings-input:focus { border-color: var(--brand); outline: none; box-shadow: 0 0 0 3px var(--brand-light-alpha); }
 
-        /* Scrollbar */
-        .admin-cc-content::-webkit-scrollbar { width: 6px; }
-        .admin-cc-content::-webkit-scrollbar-track { background: transparent; }
-        .admin-cc-content::-webkit-scrollbar-thumb { background-color: var(--line); border-radius: 3px; }
-        .admin-cc-content::-webkit-scrollbar-thumb:hover { background-color: var(--ink-light); }
+        /* Scrollbar Polish */
+        .admin-cc-scroll-area::-webkit-scrollbar { width: 8px; }
+        .admin-cc-scroll-area::-webkit-scrollbar-track { background: transparent; }
+        .admin-cc-scroll-area::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 4px; }
+        .admin-cc-scroll-area::-webkit-scrollbar-thumb:hover { background-color: rgba(0,0,0,0.2); }
     `;
     document.head.appendChild(style);
 }
@@ -187,14 +312,12 @@ export function addToDraft(type, id, details) {
         if (!adminDraft.pendingPois[id]) {
             adminDraft.pendingPois[id] = { changes: [], timestamp };
         }
-        // details = { key: 'price', value: 10 } or { type: 'coords' }
         if (details.key && !adminDraft.pendingPois[id].changes.includes(details.key)) {
             adminDraft.pendingPois[id].changes.push(details.key);
         } else if (details.type === 'coords' && !adminDraft.pendingPois[id].changes.includes('geometry')) {
             adminDraft.pendingPois[id].changes.push('geometry');
         }
     } else if (type === 'circuit') {
-        // id is typically the filename or circuit name
         adminDraft.pendingCircuits[id] = {
             type: details.type || 'update',
             timestamp
@@ -207,21 +330,33 @@ export function addToDraft(type, id, details) {
 // --- UI ---
 
 export async function openControlCenter() {
-    // 1. Structure de la modale
+    // Force specific class on modal content for overrides
+    const modalContent = document.getElementById('custom-modal-message').parentElement; // .custom-modal-content
+    if (modalContent) {
+        modalContent.classList.add('admin-cc-mode');
+    }
+
+    // 1. Structure HTML (Header Sticky + Scrollable Body)
     const html = `
         <div class="admin-cc-container">
-            <div class="admin-cc-tabs">
-                <div class="admin-cc-tab active" data-tab="dashboard">
-                    <i data-lucide="layout-dashboard" style="width:16px; vertical-align:middle; margin-right:5px;"></i> Tableau de Bord
+            <div class="admin-cc-header">
+                <div class="admin-cc-title">
+                    <i data-lucide="shield-check" style="color:var(--brand);"></i> Centre de Contrôle
                 </div>
-                <div class="admin-cc-tab" data-tab="changes">
-                    <i data-lucide="list-checks" style="width:16px; vertical-align:middle; margin-right:5px;"></i> Détail
-                </div>
-                <div class="admin-cc-tab" data-tab="settings">
-                    <i data-lucide="settings" style="width:16px; vertical-align:middle; margin-right:5px;"></i> Config
+                <div class="admin-cc-tabs">
+                    <div class="admin-cc-tab active" data-tab="dashboard">
+                        <i data-lucide="layout-grid" width="18"></i> Tableau de Bord
+                    </div>
+                    <div class="admin-cc-tab" data-tab="changes">
+                        <i data-lucide="list-checks" width="18"></i> Détail des Modifications
+                    </div>
+                    <div class="admin-cc-tab" data-tab="settings">
+                        <i data-lucide="settings-2" width="18"></i> Configuration
+                    </div>
                 </div>
             </div>
-            <div id="admin-cc-content" class="admin-cc-content">
+
+            <div id="admin-cc-content" class="admin-cc-scroll-area">
                 <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:300px; color:var(--ink-soft);">
                     <i data-lucide="loader-2" class="spin" style="width:48px; height:48px; margin-bottom:15px; color:var(--brand);"></i>
                     <div style="font-weight:500;">Analyse des modifications en cours...</div>
@@ -230,13 +365,13 @@ export async function openControlCenter() {
         </div>
     `;
 
-    // 2. Ouverture Modale
-    // On n'attend PAS la fermeture (await), sinon le code suivant ne s'exécuterait qu'à la fermeture !
-    showAlert("Centre de Contrôle Admin", html, null);
+    // 2. Open Modal
+    // We pass 'null' for title because we handle the header inside the custom HTML for layout control
+    showAlert("", html, null);
 
-    // Refresh icons immediately for the initial loader
-    const content = document.getElementById('admin-cc-content');
-    if (content) createIcons({ icons, root: content.parentElement });
+    // Hide default modal title if possible or just ignore it
+    const defaultTitle = document.getElementById('custom-modal-title');
+    if (defaultTitle) defaultTitle.style.display = 'none';
 
     // 3. Setup Tabs
     const tabs = document.querySelectorAll('.admin-cc-tab');
@@ -248,21 +383,35 @@ export async function openControlCenter() {
         };
     });
 
-    // 4. Custom Footer Actions
+    // 4. Custom Footer Actions (Sticky Bottom)
     const actions = document.getElementById('custom-modal-actions');
     if (actions) {
         actions.innerHTML = `
             <button class="custom-modal-btn secondary" onclick="document.getElementById('custom-modal-overlay').classList.remove('active')">Fermer</button>
-            <button class="custom-modal-btn primary" id="btn-cc-publish">
-                <i data-lucide="upload-cloud"></i> Tout Publier
+            <button class="custom-modal-btn primary" id="btn-cc-publish" style="background:var(--brand); font-weight:700; padding:10px 24px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+                <i data-lucide="rocket"></i> TOUT PUBLIER
             </button>
         `;
         createIcons({ icons, root: actions });
-
         document.getElementById('btn-cc-publish').onclick = publishChanges;
     }
 
-    // 5. Load Data & Render Default Tab
+    // Clean up when modal closes
+    const overlay = document.getElementById('custom-modal-overlay');
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'class' && !overlay.classList.contains('active')) {
+                // Remove custom class when closed
+                if (modalContent) modalContent.classList.remove('admin-cc-mode');
+                if (defaultTitle) defaultTitle.style.display = 'block';
+                observer.disconnect();
+            }
+        });
+    });
+    observer.observe(overlay, { attributes: true });
+
+
+    // 5. Load Data & Render
     await prepareDiffData();
     renderTab('dashboard');
 }
@@ -277,7 +426,7 @@ let diffData = {
 };
 
 async function prepareDiffData() {
-    // A. Fetch Original from GitHub (Cache Busting)
+    // Similar logic to previous version
     let originalFeatures = [];
     try {
         const timestamp = Date.now();
@@ -287,34 +436,28 @@ async function prepareDiffData() {
         if (response.ok) {
             const json = await response.json();
             originalFeatures = json.features;
-        } else {
-            console.warn("Impossible de charger l'original GitHub. Comparaison locale uniquement.");
         }
     } catch (e) {
         console.error("Erreur fetch original", e);
     }
 
-    // B. Reset Data
     diffData.pois = [];
     diffData.stats = { poisModified: 0, photosAdded: 0, circuitsModified: 0 };
 
-    // C. Process POIs
     const pendingIds = Object.keys(adminDraft.pendingPois);
 
     pendingIds.forEach(id => {
         const current = state.loadedFeatures.find(f => getPoiId(f) === id);
         const original = originalFeatures.find(f => getPoiId(f) === id);
 
-        if (!current) return; // Should not happen unless deleted
+        if (!current) return;
 
         const changes = [];
-        let hasPhotoChange = false;
 
-        // 1. Geometry
+        // Geometry
         if (original) {
             const [oLng, oLat] = original.geometry.coordinates;
             const [cLng, cLat] = current.geometry.coordinates;
-            // Round to 5 decimals to avoid float noise
             if (oLng.toFixed(5) !== cLng.toFixed(5) || oLat.toFixed(5) !== cLat.toFixed(5)) {
                 changes.push({
                     key: 'Position',
@@ -324,21 +467,17 @@ async function prepareDiffData() {
             }
         }
 
-        // 2. Properties (userData merged)
+        // Properties
         const trackedKeys = adminDraft.pendingPois[id].changes;
-        // On check aussi toutes les clés userData présentes
         const userData = current.properties.userData || {};
-
-        // Merge tracked keys and actual userData keys
         const allKeysToCheck = new Set([...trackedKeys, ...Object.keys(userData)]);
 
         allKeysToCheck.forEach(key => {
-            if (key === 'lat' || key === 'lng') return; // Handled by geometry
+            if (key === 'lat' || key === 'lng') return;
 
             let oldVal = original ? original.properties[key] : undefined;
             let newVal = userData[key] !== undefined ? userData[key] : current.properties[key];
 
-            // Special handling for Photos (Array)
             if (key === 'photos') {
                 const oldLen = (oldVal || []).length;
                 const newLen = (newVal || []).length;
@@ -347,22 +486,16 @@ async function prepareDiffData() {
                         key: 'Photos',
                         old: `${oldLen} photo(s)`,
                         new: `${newLen} photo(s)`,
-                        isPhoto: true
                     });
-                    hasPhotoChange = true;
-                    // Approximate new photos count (simple diff)
-                    if (newLen > oldLen) {
-                        diffData.stats.photosAdded += (newLen - oldLen);
-                    }
+                    if (newLen > oldLen) diffData.stats.photosAdded += (newLen - oldLen);
                 }
                 return;
             }
 
-            // Standard comparison
             if (String(oldVal) !== String(newVal)) {
                 changes.push({
                     key: key,
-                    old: oldVal !== undefined ? oldVal : '(vide)',
+                    old: oldVal !== undefined ? oldVal : '—',
                     new: newVal
                 });
             }
@@ -378,7 +511,6 @@ async function prepareDiffData() {
         }
     });
 
-    // D. Process Circuits
     diffData.stats.circuitsModified = Object.keys(adminDraft.pendingCircuits).length;
 }
 
@@ -395,132 +527,119 @@ function renderTab(tabName) {
         renderSettings(container);
     }
 
-    // Re-run icons for new content
     createIcons({ icons, root: container });
 }
 
 function renderDashboard(container) {
     const { poisModified, photosAdded, circuitsModified } = diffData.stats;
+    const total = poisModified + circuitsModified;
 
     container.innerHTML = `
         <div class="dashboard-grid">
             <div class="stat-card">
-                <div class="stat-icon"><i data-lucide="map-pin" width="32" height="32"></i></div>
+                <div class="stat-icon"><i data-lucide="map-pin" width="36" height="36"></i></div>
                 <div class="stat-value">${poisModified}</div>
                 <div class="stat-label">Lieux</div>
-                <div class="stat-subtext">Modifiés ou Créés</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"><i data-lucide="camera" width="32" height="32"></i></div>
+                <div class="stat-icon"><i data-lucide="camera" width="36" height="36"></i></div>
                 <div class="stat-value">${photosAdded}</div>
                 <div class="stat-label">Photos</div>
-                <div class="stat-subtext">Ajoutées au total</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"><i data-lucide="route" width="32" height="32"></i></div>
+                <div class="stat-icon"><i data-lucide="route" width="36" height="36"></i></div>
                 <div class="stat-value">${circuitsModified}</div>
                 <div class="stat-label">Circuits</div>
-                <div class="stat-subtext">Mis à jour</div>
             </div>
         </div>
 
-        <div style="background:var(--surface-muted); padding:20px; border-radius:12px; border:1px solid var(--line);">
-            <h3 style="margin-top:0; display:flex; align-items:center; gap:10px;">
-                <i data-lucide="info" style="color:var(--brand);"></i> État de la Synchronisation
-            </h3>
-            <p style="line-height:1.6;">
-                Vous avez <strong>${poisModified + circuitsModified} éléments modifiés</strong> en attente de publication.
-                Ces changements sont actuellement sauvegardés <em>localement</em> dans votre navigateur.
-            </p>
-            <p style="font-size:0.9em; color:var(--ink-soft); margin-top:10px;">
-                Cliquez sur le bouton <strong>"Tout Publier"</strong> ci-dessous pour envoyer ces modifications sur GitHub
-                et mettre à jour la carte officielle pour tous les utilisateurs.
-            </p>
-        </div>
+        ${total > 0 ? `
+            <div class="sync-banner">
+                <i data-lucide="info" width="24" height="24"></i>
+                <div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Synchronisation Requise</h3>
+                    <p style="margin:0; opacity:0.9;">
+                        Vous avez <strong>${total} modifications</strong> en attente.
+                        Ces données sont stockées localement sur votre navigateur.
+                        Pour les rendre publiques, cliquez sur "Tout Publier".
+                    </p>
+                </div>
+            </div>
+        ` : `
+            <div style="text-align:center; padding:40px; color:var(--ink-light); background:var(--surface); border-radius:12px; border:1px dashed var(--line);">
+                <i data-lucide="check-check" width="48" height="48" style="margin-bottom:10px; opacity:0.5;"></i>
+                <div>Tout est à jour. Aucune modification locale détectée.</div>
+            </div>
+        `}
     `;
 }
 
 function renderChanges(container) {
     if (diffData.pois.length === 0 && diffData.stats.circuitsModified === 0) {
-        container.innerHTML = `
-            <div style="text-align:center; padding:60px 20px; color:var(--ink-soft);">
-                <i data-lucide="check-circle-2" style="width:48px; height:48px; opacity:0.5; margin-bottom:15px;"></i>
-                <div style="font-size:1.1em; font-weight:500;">Tout est à jour !</div>
-                <div style="font-size:0.9em; opacity:0.7; margin-top:5px;">Aucune modification en attente.</div>
-            </div>
-        `;
+        container.innerHTML = `<div style="text-align:center; padding:50px;">Aucune modification à afficher.</div>`;
         return;
     }
 
-    let html = '';
+    let html = `<div class="diff-container">`;
 
-    // POIs Section
+    // POIs
     if (diffData.pois.length > 0) {
-        html += `<h4 style="margin:10px 0 15px 0; color:var(--ink-soft); text-transform:uppercase; font-size:0.85em; letter-spacing:1px;">Lieux (${diffData.pois.length})</h4>`;
         html += diffData.pois.map(item => `
-            <div class="diff-item">
-                <div class="diff-header">
+            <div class="diff-card">
+                <div class="diff-card-header">
                     <div class="diff-title">
-                        <i data-lucide="map-pin" width="16" style="color:var(--brand);"></i> ${item.name}
+                        <i data-lucide="map-pin" width="18" style="color:var(--brand);"></i> ${item.name}
                     </div>
                     <div class="diff-id">${item.id}</div>
                 </div>
-                ${item.changes.map(c => `
-                    <div class="diff-row">
-                        <div class="diff-label">${c.key}</div>
-                        <div class="diff-old">${c.old}</div>
-                        <div class="diff-arrow">➜</div>
-                        <div class="diff-new">${c.new}</div>
-                    </div>
-                `).join('')}
+                <table class="diff-table">
+                    <thead>
+                        <tr>
+                            <th>Propriété</th>
+                            <th>Ancienne Valeur</th>
+                            <th></th>
+                            <th>Nouvelle Valeur</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${item.changes.map(c => `
+                            <tr>
+                                <td class="diff-key">${c.key}</td>
+                                <td class="diff-old">${c.old}</td>
+                                <td class="diff-arrow">➜</td>
+                                <td class="diff-new">${c.new}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
             </div>
         `).join('');
     }
 
-    // Circuits Section
-    const circuitIds = Object.keys(adminDraft.pendingCircuits);
-    if (circuitIds.length > 0) {
-        html += `<h4 style="margin:25px 0 15px 0; color:var(--ink-soft); text-transform:uppercase; font-size:0.85em; letter-spacing:1px;">Circuits (${circuitIds.length})</h4>`;
-        html += circuitIds.map(cid => {
-            const c = adminDraft.pendingCircuits[cid];
-            return `
-            <div class="diff-item">
-                <div class="diff-header">
-                    <div class="diff-title">
-                        <i data-lucide="route" width="16" style="color:var(--brand);"></i> ${cid}
-                    </div>
-                    <div class="diff-id">${c.type.toUpperCase()}</div>
-                </div>
-                <div style="font-size:0.9em; color:var(--ink-soft);">
-                    Modifié le ${new Date(c.timestamp).toLocaleString()}
-                </div>
-            </div>
-        `}).join('');
-    }
-
+    html += `</div>`;
     container.innerHTML = html;
 }
 
 function renderSettings(container) {
     const token = getStoredToken() || '';
     container.innerHTML = `
-        <div class="settings-panel">
-            <label style="display:block; margin-bottom: 8px; font-weight: 600;">GitHub Personal Access Token (PAT)</label>
-            <input type="password" id="cc-token-input" value="${token}" class="settings-input" placeholder="ghp_...">
+        <div style="max-width:600px; margin:0 auto;">
+            <div style="background:var(--surface); padding:30px; border-radius:16px; border:1px solid var(--line); box-shadow:0 4px 15px rgba(0,0,0,0.02);">
+                <h3 style="margin-top:0;">Configuration GitHub</h3>
+                <p style="color:var(--ink-soft); margin-bottom:20px;">
+                    Le Token d'accès personnel (PAT) permet à l'application d'écrire sur le dépôt GitHub.
+                </p>
 
-            <div style="background:var(--surface-muted); padding:15px; border-radius:8px; margin-bottom:20px; font-size:0.85em; color:var(--ink-soft);">
-                <i data-lucide="lock" width="14" style="vertical-align:middle; margin-right:5px;"></i>
-                Ce token est stocké de manière sécurisée dans le stockage local de votre navigateur.
-                Il est nécessaire pour publier les mises à jour sur le dépôt GitHub.
+                <label style="display:block; margin-bottom: 8px; font-weight: 600;">Personal Access Token</label>
+                <input type="password" id="cc-token-input" value="${token}" class="settings-input" placeholder="ghp_...">
+
+                <button class="custom-modal-btn primary" id="btn-save-token" style="width:100%; margin-top:20px; padding:12px;">
+                    <i data-lucide="save"></i> Sauvegarder Token
+                </button>
             </div>
-
-            <button class="custom-modal-btn primary" id="btn-save-token" style="width:100%;">
-                <i data-lucide="save"></i> Sauvegarder Token
-            </button>
         </div>
     `;
 
-    // Wait for DOM
     setTimeout(() => {
         const btn = document.getElementById('btn-save-token');
         if (btn) {
@@ -538,71 +657,50 @@ function renderSettings(container) {
 async function publishChanges() {
     const token = getStoredToken();
     if (!token) {
-        showToast("Token manquant. Allez dans l'onglet Configuration.", "error");
-        renderTab('settings');
-        // Activate settings tab UI
-        document.querySelectorAll('.admin-cc-tab').forEach(t => {
-            t.classList.toggle('active', t.dataset.tab === 'settings');
-        });
+        showToast("Token manquant. Vérifiez la configuration.", "error");
         return;
     }
 
-    if (!confirm("Êtes-vous sûr de vouloir publier ces changements sur GitHub ?\nCette action est définitive.")) {
-        return;
-    }
+    if (!confirm("Publier toutes les modifications sur GitHub ?")) return;
 
     const btn = document.getElementById('btn-cc-publish');
     if (btn) {
         btn.disabled = true;
-        btn.innerHTML = `<i data-lucide="loader-2" class="spin"></i> Publication...`;
+        btn.innerHTML = `<i data-lucide="loader-2" class="spin"></i> Envoi...`;
         createIcons({ icons, root: btn });
     }
 
     try {
-        // 1. Generate Master GeoJSON
         const geojson = generateMasterGeoJSONData();
-        if (!geojson) throw new Error("Erreur génération GeoJSON");
+        if (!geojson) throw new Error("Erreur données GeoJSON");
 
         const mapId = state.currentMapId || 'djerba';
         const filename = `${mapId}.geojson`;
         const blob = new Blob([JSON.stringify(geojson, null, 2)], { type: 'application/geo+json' });
         const file = new File([blob], filename, { type: 'application/geo+json' });
 
-        // 2. Upload
-        const repoOwner = 'Stefanmartin1967'; // Should come from config/state really
-        const repoName = 'History-Walk-V1';
-        const path = `public/${filename}`;
+        await uploadFileToGitHub(file, token, 'Stefanmartin1967', 'History-Walk-V1', `public/${filename}`, `Update via Admin Center`);
 
-        await uploadFileToGitHub(file, token, repoOwner, repoName, path, `Admin Update via Control Center (${diffData.pois.length} POIs)`);
-
-        // 3. Success & Cleanup
         showToast("Publication réussie !", "success");
-
-        // Reset Draft
         adminDraft = { pendingPois: {}, pendingCircuits: {} };
         saveDraft();
         updateButtonBadge();
 
-        // Optional: Clear merged userData from local storage to keep it clean?
-        // Let's clear the tracked IDs from userData to be clean.
+        // Clean local userData for published POIs
         diffData.pois.forEach(p => {
-             if (state.userData[p.id]) {
-                 delete state.userData[p.id];
-             }
+             if (state.userData[p.id]) delete state.userData[p.id];
         });
-        // Save the cleaned userData once
         await saveAppState('userData', state.userData);
 
-
-        alert("La carte a été mise à jour avec succès !\nLes changements seront visibles dans quelques minutes.");
+        alert("Mise à jour effectuée avec succès !");
         document.getElementById('custom-modal-overlay').classList.remove('active');
 
     } catch (e) {
         console.error(e);
-        showToast("Erreur publication: " + e.message, "error");
+        showToast("Erreur: " + e.message, "error");
         if (btn) {
             btn.disabled = false;
-            btn.innerHTML = `<i data-lucide="upload-cloud"></i> Réessayer`;
+            btn.innerHTML = `<i data-lucide="rocket"></i> Réessayer`;
             createIcons({ icons, root: btn });
         }
     }
