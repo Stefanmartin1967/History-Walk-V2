@@ -58,7 +58,6 @@ function setupAdminListeners() {
     }
 
     // --- NOUVEAU : Bouton Console Fusion ---
-    // menuContainer already defined above
     if (menuContainer) {
         let btnFusion = document.getElementById('btn-admin-fusion');
         if (!btnFusion) {
@@ -107,7 +106,7 @@ function setupAdminListeners() {
     }
 
     // --- Ajout Dynamique du Bouton RANGS dans le Menu Admin ---
-    const menuContainer = document.getElementById('admin-menu-content');
+    // menuContainer est déjà déclaré plus haut dans la fonction
     if (menuContainer) {
         // On vérifie si le bouton existe déjà (pour éviter les doublons lors des HMR)
         let btnRanks = document.getElementById('btn-admin-show-ranks');
