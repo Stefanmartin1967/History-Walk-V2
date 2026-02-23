@@ -57,33 +57,6 @@ function setupAdminListeners() {
         });
     }
 
-    // --- NOUVEAU : Bouton Console Fusion ---
-    // menuContainer already defined above
-    if (menuContainer) {
-        let btnFusion = document.getElementById('btn-admin-fusion');
-        if (!btnFusion) {
-            btnFusion = document.createElement('button');
-            btnFusion.id = 'btn-admin-fusion';
-            btnFusion.className = 'tools-menu-item';
-            btnFusion.innerHTML = `<i data-lucide="merge"></i> Console Fusion`;
-
-            // Insert after Scout button if possible
-            const scoutBtn = document.getElementById('btn-admin-scout');
-            if (scoutBtn && scoutBtn.parentNode === menuContainer) {
-                menuContainer.insertBefore(btnFusion, scoutBtn.nextSibling);
-            } else {
-                 menuContainer.appendChild(btnFusion);
-            }
-            createIcons({ icons, root: btnFusion });
-        }
-
-        const newFusionBtn = btnFusion.cloneNode(true);
-        btnFusion.parentNode.replaceChild(newFusionBtn, btnFusion);
-        newFusionBtn.addEventListener('click', () => {
-             window.open('tools/fusion.html', '_blank');
-        });
-    }
-
     const btnExport = document.getElementById('btn-admin-export-master');
     if (btnExport) {
         btnExport.addEventListener('click', exportMasterGeoJSON);
@@ -107,7 +80,7 @@ function setupAdminListeners() {
     }
 
     // --- Ajout Dynamique du Bouton RANGS dans le Menu Admin ---
-    const menuContainer = document.getElementById('admin-menu-content');
+    // menuContainer est déjà déclaré plus haut dans la fonction
     if (menuContainer) {
         // On vérifie si le bouton existe déjà (pour éviter les doublons lors des HMR)
         let btnRanks = document.getElementById('btn-admin-show-ranks');
