@@ -67,6 +67,70 @@ function extractTrackPoints(gpxContent) {
     return coords;
 }
 
+function extractWaypoints(gpxContent) {
+    const wpts = [];
+    // More robust regex for <wpt> block, capturing lat/lon and body
+    const regex = /<wpt[^>]+lat="([^"]+)"[^>]+lon="([^"]+)"[^>]*>([\s\S]*?)<\/wpt>/g;
+    let match;
+
+    // Also try reversed attribute order if regex fails (simple quick fix: just make regex attribute order agnostic)
+    // Actually, let's use a simpler approach: find <wpt, extract attributes, then find <name> inside
+
+    const wptBlocks = gpxContent.match(/<wpt[\s\S]*?<\/wpt>/g);
+    if (!wptBlocks) return [];
+
+    wptBlocks.forEach(block => {
+        const latMatch = block.match(/lat="([^"]+)"/);
+        const lonMatch = block.match(/lon="([^"]+)"/);
+        const nameMatch = block.match(/<name>(.*?)<\/name>/);
+
+        if (latMatch && lonMatch) {
+            let name = nameMatch ? unescapeXml(nameMatch[1].trim()) : null;
+            if (name && name.includes('<![CDATA[')) {
+                 name = name.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1');
+            }
+            wpts.push({
+                lat: parseFloat(latMatch[1]),
+                lon: parseFloat(lonMatch[1]),
+                name: name
+            });
+        }
+    });
+
+    return wpts;
+}
+
+function matchWaypointsToPois(wpts, poiFeatures) {
+    const matchedIds = new Set();
+
+    wpts.forEach(wpt => {
+        if (!wpt.name) return;
+
+        // 1. Exact Name Match (Normalized)
+        const normalize = (str) => str ? str.toLowerCase().trim() : '';
+        const wptName = normalize(wpt.name);
+
+        let match = poiFeatures.find(f => {
+            const pNameFR = normalize(f.properties['Nom du site FR']);
+            return pNameFR === wptName;
+        });
+
+        // 2. Fallback: Very close proximity (< 20m)
+        if (!match) {
+            match = poiFeatures.find(f => {
+                const [lon, lat] = f.geometry.coordinates;
+                return getDistance(lat, lon, wpt.lat, wpt.lon) < 20;
+            });
+        }
+
+        if (match) {
+            matchedIds.add(match.properties.HW_ID);
+        }
+    });
+
+    return Array.from(matchedIds);
+}
+
 function calculateTrackDistance(coords) {
     if (coords.length < 2) return 0;
 
@@ -161,9 +225,10 @@ function loadPOIs(poiFilename) {
     return [];
 }
 
-function findPOIsOnTrack(trackPoints, poiFeatures) {
+function findPOIsOnTrack(trackPoints, poiFeatures, priorityIds = []) {
     const matchedPOIs = [];
     const DISTANCE_THRESHOLD = 50; // meters
+    const PRIORITY_THRESHOLD = 500; // meters (more lenient for explicit WPTs)
 
     // Optimization: Calculate bounding box of track to quickly exclude distant POIs
     let minLat = 90, maxLat = -90, minLon = 180, maxLon = -180;
@@ -174,8 +239,8 @@ function findPOIsOnTrack(trackPoints, poiFeatures) {
         if (pt[1] > maxLon) maxLon = pt[1];
     });
 
-    // Add buffer to bbox (approx 0.001 degrees is ~100m)
-    const buffer = 0.002;
+    // Add buffer to bbox (approx 0.005 degrees is ~500m)
+    const buffer = 0.01;
     minLat -= buffer; maxLat += buffer;
     minLon -= buffer; maxLon += buffer;
 
@@ -189,12 +254,16 @@ function findPOIsOnTrack(trackPoints, poiFeatures) {
         let bestIndex = -1;
         let minDistance = Infinity;
 
+        // Check if this POI is a "priority" (from GPX <wpt>)
+        const isPriority = priorityIds.includes(poi.properties.HW_ID);
+        const threshold = isPriority ? PRIORITY_THRESHOLD : DISTANCE_THRESHOLD;
+
         // Find the closest point on the track for this POI
         for (let i = 0; i < trackPoints.length; i++) {
             const [trackLat, trackLon] = trackPoints[i];
             const dist = getDistance(trackLat, trackLon, poiLat, poiLon);
 
-            if (dist <= DISTANCE_THRESHOLD) {
+            if (dist <= threshold) {
                 if (dist < minDistance) {
                     minDistance = dist;
                     bestIndex = i;
@@ -208,11 +277,38 @@ function findPOIsOnTrack(trackPoints, poiFeatures) {
                 index: bestIndex,
                 distance: minDistance
             });
+        } else if (isPriority) {
+            // Even if it's outside the threshold, we really want to include priority POIs if possible.
+            // But if it's > 500m away, maybe it's just wrong data?
+            // Let's force find the closest point regardless of distance for priority POIs to ensure correct sorting relative to track.
+             let absoluteMinDistance = Infinity;
+             let absoluteBestIndex = -1;
+
+             for (let i = 0; i < trackPoints.length; i++) {
+                const [trackLat, trackLon] = trackPoints[i];
+                const dist = getDistance(trackLat, trackLon, poiLat, poiLon);
+                if (dist < absoluteMinDistance) {
+                    absoluteMinDistance = dist;
+                    absoluteBestIndex = i;
+                }
+            }
+
+            // Only add if reasonable (e.g. < 5km? Let's say 2km to be safe)
+            if (absoluteMinDistance < 2000) {
+                 matchedPOIs.push({
+                    id: poi.properties.HW_ID,
+                    index: absoluteBestIndex,
+                    distance: absoluteMinDistance
+                });
+            }
         }
     });
 
     // Sort POIs by their position along the track (index)
     matchedPOIs.sort((a, b) => a.index - b.index);
+
+    // Dedup (keep first occurrence if multiple - though IDs are unique in matchedPOIs logic above? No, distinct objects pushed)
+    // Actually loop iterates nearbyPOIs once, so no duplicate pushes for same POI.
 
     return matchedPOIs.map(p => p.id);
 }
@@ -340,8 +436,12 @@ function processDirectory(mapId, zones, destinations) {
 
         let zone = null;
 
-        // Find POIs on track
-        const poiIds = findPOIsOnTrack(trackPoints, poiFeatures);
+        // Extract Explicit Waypoints (Priority)
+        const wpts = extractWaypoints(content);
+        const priorityIds = matchWaypointsToPois(wpts, poiFeatures);
+
+        // Find POIs on track (Combined)
+        const poiIds = findPOIsOnTrack(trackPoints, poiFeatures, priorityIds);
 
         // Determine Zone
         // Priority 1: Zone of the first POI
