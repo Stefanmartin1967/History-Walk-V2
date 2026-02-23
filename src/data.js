@@ -12,6 +12,7 @@ import {
 import { logModification } from './logger.js';
 import { showToast } from './toast.js';
 import { getPoiId, getPoiName } from './utils.js';
+import { addToDraft } from './admin-control-center.js';
 
 // --- UTILITAIRES ---
 
@@ -169,6 +170,11 @@ export async function updatePoiData(poiId, key, value) {
 
     // Sauvegarde en Base de Données
     await savePoiData(state.currentMapId, poiId, state.userData[poiId]);
+
+    // [ADMIN] Tracking
+    if (state.isAdmin) {
+        addToDraft('poi', poiId, { key: key, value: value });
+    }
 }
 
 // --- AJOUT D'UN LIEU (Fonction Post-it) ---
@@ -198,6 +204,11 @@ export async function addPoiFeature(feature) {
 
     // 3. Rafraîchissement de la carte pour afficher le nouveau point
     applyFilters();
+
+    // [ADMIN] Tracking
+    if (state.isAdmin) {
+        addToDraft('poi', id, { type: 'creation' });
+    }
 }
 
 // --- MISE À JOUR DE LA POSITION (GEOMETRY) ---
@@ -232,4 +243,9 @@ export async function updatePoiCoordinates(poiId, lat, lng) {
 
     // Log
     await logModification(poiId, 'Deplacement', 'All', null, `Nouvelle position : ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+
+    // [ADMIN] Tracking
+    if (state.isAdmin) {
+        addToDraft('poi', poiId, { type: 'coords', lat, lng });
+    }
 }
