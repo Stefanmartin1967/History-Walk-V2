@@ -52,9 +52,16 @@ export const MATERIAL_RANKS = [
 
 export function calculateStats() {
     // 1. POIs Visités (Base de référence pour la Gamification)
-    const totalPois = state.loadedFeatures.length;
+    // On exclut les POIs "cachés" (Corbeille)
+    const validFeatures = state.loadedFeatures.filter(feature => {
+        const id = getPoiId(feature);
+        return !state.hiddenPoiIds || !state.hiddenPoiIds.includes(id);
+    });
+
+    const totalPois = validFeatures.length;
     let visitedPois = 0;
-    state.loadedFeatures.forEach(feature => {
+
+    validFeatures.forEach(feature => {
         const id = getPoiId(feature);
         if (state.userData[id] && state.userData[id].vu) {
             visitedPois++;
