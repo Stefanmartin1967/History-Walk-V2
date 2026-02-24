@@ -405,6 +405,18 @@ async function prepareDiffData() {
             return;
         }
 
+        // Cas spécial : Création (Nouveau POI)
+        if (!original && current) {
+             diffData.pois.push({
+                id: id,
+                name: getPoiName(current),
+                changes: [{ key: 'STATUT', old: 'Inexistant', new: 'NOUVEAU' }],
+                isCreation: true
+            });
+            diffData.stats.poisModified++;
+            return;
+        }
+
         if (!current) return;
 
         const changes = [];
@@ -507,11 +519,11 @@ function renderTab(tab) {
         }
 
         let html = diffData.pois.map(item => `
-            <div class="diff-entry" id="diff-card-${item.id}" style="${item.isDeletion ? 'border:1px solid #FCA5A5; background:#FEF2F2;' : ''}">
+            <div class="diff-entry" id="diff-card-${item.id}" style="${item.isDeletion ? 'border:1px solid #FCA5A5; background:#FEF2F2;' : (item.isCreation ? 'border:1px solid #86EFAC; background:#F0FDF4;' : '')}">
                 <div class="diff-header">
-                    <div class="diff-title" style="${item.isDeletion ? 'color:#991B1B;' : ''}">
-                        <i data-lucide="${item.isDeletion ? 'trash-2' : 'map-pin'}" width="18" style="color:${item.isDeletion ? '#DC2626' : 'var(--hw-amber)'};"></i>
-                        ${item.name} ${item.isDeletion ? '(SUPPRESSION)' : ''}
+                    <div class="diff-title" style="${item.isDeletion ? 'color:#991B1B;' : (item.isCreation ? 'color:#166534;' : '')}">
+                        <i data-lucide="${item.isDeletion ? 'trash-2' : (item.isCreation ? 'plus-circle' : 'map-pin')}" width="18" style="color:${item.isDeletion ? '#DC2626' : (item.isCreation ? '#16A34A' : 'var(--hw-amber)')};"></i>
+                        ${item.name} ${item.isDeletion ? '(SUPPRESSION)' : (item.isCreation ? '(NOUVEAU)' : '')}
                     </div>
                     <div class="diff-actions">
                         <button class="btn-diff-action refuse" onclick="processDecision('${item.id}', 'refuse')">Refuser</button>
@@ -645,7 +657,12 @@ async function publishChanges() {
 }
 
 export function addToDraft(type, id, details) {
-    if (type === 'poi') adminDraft.pendingPois[id] = { timestamp: Date.now() };
+    if (type === 'poi') {
+        adminDraft.pendingPois[id] = {
+            timestamp: Date.now(),
+            ...details
+        };
+    }
     if (type === 'circuit') adminDraft.pendingCircuits[id] = { timestamp: Date.now() };
 
     localStorage.setItem(DRAFT_KEY, JSON.stringify(adminDraft));
