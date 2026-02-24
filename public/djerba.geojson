@@ -3136,7 +3136,7 @@
         "Desc_wpt": "Masquée et mausolée malékite de construction récente intégrant le mausolée",
         "HW_ID": "HW-01K77WPE6G4S44DJQ98414C336",
         "vu": true,
-        "planifieCounter": 1
+        "planifieCounter": 0
       }
     },
     {
@@ -3372,7 +3372,7 @@
         "Prix d'entrée": null,
         "Desc_wpt": "Mosquée hanafite puis malékite construite en 1560 de notre ère",
         "HW_ID": "HW-01K77WPE6G6RDSP8C7C5WQVJCN",
-        "planifieCounter": 2,
+        "planifieCounter": 1,
         "vu": true
       }
     },
@@ -5406,7 +5406,7 @@
         "Prix d'entrée": null,
         "Desc_wpt": null,
         "HW_ID": "HW-01K77WPE6P5C0194DPJWYMX9C1",
-        "planifieCounter": 1,
+        "planifieCounter": 0,
         "vu": true
       }
     },
@@ -5742,7 +5742,7 @@
         "Prix d'entrée": null,
         "Desc_wpt": null,
         "HW_ID": "HW-01K77WPE6QN6S4TSGEZQ6DQGXA",
-        "planifieCounter": 1,
+        "planifieCounter": 0,
         "vu": true
       }
     },
@@ -6047,7 +6047,7 @@
         "Prix d'entrée": null,
         "Desc_wpt": null,
         "HW_ID": "HW-01K77WPE6RQNBBQXWYACNJTRAC",
-        "planifieCounter": 1,
+        "planifieCounter": 0,
         "vu": true,
         "photos": []
       }
@@ -6354,7 +6354,7 @@
         "Prix d'entrée": null,
         "Desc_wpt": null,
         "HW_ID": "HW-01K77WPE67434E7DEZHRXH0XL60RGD",
-        "planifieCounter": 1,
+        "planifieCounter": 0,
         "vu": true
       }
     },
@@ -6497,7 +6497,7 @@
         "lat": 33.87735026737242,
         "lng": 10.858738124370577,
         "vu": true,
-        "planifieCounter": 2
+        "planifieCounter": 0
       }
     },
     {
@@ -6533,7 +6533,7 @@
         "Catégorie": "Restaurant",
         "Zone": "Houmt Souk",
         "vu": true,
-        "planifieCounter": 1
+        "planifieCounter": 0
       }
     },
     {
@@ -6606,7 +6606,7 @@
         "Catégorie": "Restaurant",
         "Zone": "Houmt Souk",
         "vu": true,
-        "planifieCounter": 1
+        "planifieCounter": 0
       }
     },
     {
@@ -6854,7 +6854,7 @@
         "price": 0,
         "HW_ID": "HW-PC-1771480791691",
         "Description": "Ajouté via Rich Editor",
-        "planifieCounter": 2,
+        "planifieCounter": 1,
         "vu": true
       }
     },
