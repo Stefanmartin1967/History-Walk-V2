@@ -32,7 +32,7 @@ export async function initAdminControlCenter() {
     // Inject styles (PREMIUM DASHBOARD - WARM THEME)
     const style = document.createElement('style');
     style.textContent = `
-        /* --- RESET & OVERRIDES --- */
+        /* --- RESET & OVERRIDES (Code Gemini) --- */
         .custom-modal-box.admin-cc-mode {
             width: min(1400px, 95vw) !important;
             max-width: none !important;
@@ -59,15 +59,13 @@ export async function initAdminControlCenter() {
             overflow: hidden !important;
         }
 
-        /* --- CONTAINER PRINCIPAL --- */
+        /* --- CONTAINER PRINCIPAL (Code Gemini) --- */
         .admin-cc-container {
             display: flex;
             flex-direction: column;
             height: 100%;
-            width: 100%;
-            font-family: 'Inter', system-ui, sans-serif;
             color: var(--ink);
-            background: var(--surface);
+            background: transparent;
         }
 
         /* --- HEADER --- */
@@ -140,7 +138,7 @@ export async function initAdminControlCenter() {
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
-        /* --- ZONE DE CONTENU (SCROLLABLE) --- */
+        /* --- ZONE DE CONTENU (Code Gemini) --- */
         .admin-cc-scroll-area {
             flex: 1;
             overflow-y: auto;
@@ -154,13 +152,12 @@ export async function initAdminControlCenter() {
             width: 100%;
         }
 
-        /* --- DASHBOARD GRID --- */
+        /* --- DASHBOARD GRID (Code Gemini) --- */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
             margin-bottom: 40px;
-            width: 100%;
         }
 
         .stat-card {
@@ -214,7 +211,16 @@ export async function initAdminControlCenter() {
             letter-spacing: 0.05em;
         }
 
-        /* --- SYNC BANNER --- */
+        /* --- BANNERS (Preserved Styles) --- */
+        .welcome-banner {
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 20px;
+            background: color-mix(in srgb, var(--brand) 5%, transparent);
+            border-radius: 16px;
+            border-left: 4px solid var(--brand);
+        }
+
         .sync-banner {
             background: var(--brand);
             color: white;
@@ -319,7 +325,7 @@ export async function initAdminControlCenter() {
             font-size: 1.2em;
         }
 
-        /* --- FOOTER FIXED --- */
+        /* --- FOOTER (Code Gemini + Flex Fixes) --- */
         .admin-cc-footer {
             padding: 20px 40px;
             background: var(--surface);
@@ -360,7 +366,7 @@ export async function initAdminControlCenter() {
         }
         .custom-modal-btn.secondary:hover { background: var(--surface-muted); color: var(--ink); border-color: var(--line); }
 
-        /* --- EMPTY STATE --- */
+        /* --- EMPTY STATE & SETTINGS (Preserved) --- */
         .empty-state-container {
             display: flex;
             flex-direction: column;
@@ -378,7 +384,6 @@ export async function initAdminControlCenter() {
             transform: scale(1.1);
         }
 
-        /* --- SETTINGS --- */
         .settings-input {
             width: 100%;
             padding: 15px;
@@ -487,7 +492,7 @@ export async function openControlCenter() {
 
             <div class="admin-cc-scroll-area">
                 <div id="admin-cc-content" class="admin-cc-content-wrapper">
-                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:300px; color:var(--ink-soft);">
+                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--ink-soft);">
                         <i data-lucide="loader-2" class="spin" style="width:48px; height:48px; margin-bottom:15px; color:var(--brand);"></i>
                         <div style="font-weight:500;">Analyse des modifications en cours...</div>
                     </div>
@@ -698,21 +703,34 @@ function renderDashboard(container) {
                 </div>
             </div>
         </div>
+        <div class="stat-card">
+            <div class="stat-value">${circuitsModified}</div>
+            <div class="stat-label">Circuits Modifiés</div>
+        </div>
+    `;
 
-        ${total > 0 ? `
-            <div class="sync-banner">
-                <i data-lucide="info" width="32" height="32"></i>
-                <div>
-                    <div style="font-weight:800; font-size:1.2rem; margin-bottom:4px;">Modifications locales en attente</div>
-                    <div style="opacity:0.9;">Cliquez sur publier pour mettre à jour la carte officielle.</div>
-                </div>
+    const syncStatusHtml = total > 0 ? `
+        <div class="sync-banner">
+            <i data-lucide="info" width="32" height="32"></i>
+            <div>
+                <div style="font-weight:800; font-size:1.2rem; margin-bottom:4px;">Modifications locales en attente</div>
+                <div style="opacity:0.9;">Cliquez sur publier pour mettre à jour la carte officielle.</div>
             </div>
-        ` : `
-            <div class="empty-state-container">
-                <i data-lucide="check-circle-2" class="empty-state-icon"></i>
-                <div style="font-weight:600; font-size:1.1rem; color:var(--ink-soft);">Votre carte est parfaitement synchronisée.</div>
-            </div>
-        `}
+        </div>
+    ` : `
+        <div class="empty-state-container">
+            <i data-lucide="check-circle-2" class="empty-state-icon"></i>
+            <div style="font-weight:600; font-size:1.1rem; color:var(--ink-soft);">Votre carte est parfaitement synchronisée.</div>
+        </div>
+    `;
+
+    container.innerHTML = `
+        <div class="welcome-banner">
+            <h3 style="margin: 0; color: var(--brand); font-size: 1.1rem;">Bonjour Admin 👋</h3>
+            <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: var(--ink-soft);">Voici l'état actuel de vos modifications locales.</p>
+        </div>
+        <div class="dashboard-grid">${cardsHtml}</div>
+        ${syncStatusHtml}
     `;
 }
 
