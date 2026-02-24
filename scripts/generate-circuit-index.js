@@ -244,9 +244,11 @@ function findPOIsOnTrack(trackPoints, poiFeatures, priorityIds = []) {
     minLat -= buffer; maxLat += buffer;
     minLon -= buffer; maxLon += buffer;
 
+    // Filter to keep ONLY POIs that are explicitly listed in the GPX (priorityIds)
+    // We ignore proximity-based discovery for non-listed POIs.
     const nearbyPOIs = poiFeatures.filter(poi => {
-        const [lon, lat] = poi.geometry.coordinates;
-        return lat >= minLat && lat <= maxLat && lon >= minLon && lon <= maxLon;
+        // Strict check: Must be in priorityIds (from <wpt>)
+        return priorityIds.includes(poi.properties.HW_ID);
     });
 
     nearbyPOIs.forEach(poi => {
@@ -255,6 +257,7 @@ function findPOIsOnTrack(trackPoints, poiFeatures, priorityIds = []) {
         let minDistance = Infinity;
 
         // Check if this POI is a "priority" (from GPX <wpt>)
+        // With the new filter above, isPriority is always true, but we keep the variable for clarity/future-proof
         const isPriority = priorityIds.includes(poi.properties.HW_ID);
         const threshold = isPriority ? PRIORITY_THRESHOLD : DISTANCE_THRESHOLD;
 
