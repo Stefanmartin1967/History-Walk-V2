@@ -1,11 +1,15 @@
 {
   "name": "History Walk",
   "short_name": "History Walk",
-  "id": "History-Walk-V1",
+  "id": "history-walk-v1",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
   "background_color": "#F0F4F8",
   "theme_color": "#0D3B66",
   "orientation": "any",
