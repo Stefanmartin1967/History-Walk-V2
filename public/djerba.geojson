@@ -1088,7 +1088,8 @@
         "Temps de visite": null,
         "Prix d'entrée": null,
         "Desc_wpt": null,
-        "HW_ID": "HW-01K77WPE6AB83SMA3RRSYH0SK9"
+        "HW_ID": "HW-01K77WPE6AB83SMA3RRSYH0SK9",
+        "planifieCounter": 0
       }
     },
     {
@@ -1165,7 +1166,8 @@
         "Temps de visite": null,
         "Prix d'entrée": null,
         "Desc_wpt": null,
-        "HW_ID": "HW-01K77WPE6A3AYDG7D68R9A0JBT"
+        "HW_ID": "HW-01K77WPE6A3AYDG7D68R9A0JBT",
+        "planifieCounter": 1
       }
     },
     {
@@ -1345,7 +1347,8 @@
         "Temps de visite": null,
         "Prix d'entrée": null,
         "Desc_wpt": null,
-        "HW_ID": "HW-01K77WPE6B2CT1A4B58N917MXQ"
+        "HW_ID": "HW-01K77WPE6B2CT1A4B58N917MXQ",
+        "planifieCounter": 1
       }
     },
     {
@@ -1499,7 +1502,8 @@
         "Temps de visite": null,
         "Prix d'entrée": null,
         "Desc_wpt": null,
-        "HW_ID": "HW-01K77WPE6BG5X8YCCG07AEVQY8"
+        "HW_ID": "HW-01K77WPE6BG5X8YCCG07AEVQY8",
+        "planifieCounter": 0
       }
     },
     {
@@ -1774,7 +1778,8 @@
         "Temps de visite": null,
         "Prix d'entrée": null,
         "Desc_wpt": null,
-        "HW_ID": "HW-01K77WPE6CP8P9RJP202ZRWJQJ"
+        "HW_ID": "HW-01K77WPE6CP8P9RJP202ZRWJQJ",
+        "planifieCounter": 0
       }
     },
     {
@@ -1975,7 +1980,8 @@
         "Temps de visite": null,
         "Prix d'entrée": null,
         "Desc_wpt": null,
-        "HW_ID": "HW-01KJABRN0DWM059C795C8SSD8C"
+        "HW_ID": "HW-01KJABRN0DWM059C795C8SSD8C",
+        "planifieCounter": 1
       }
     },
     {
@@ -2377,7 +2383,8 @@
         "Temps de visite": null,
         "Prix d'entrée": null,
         "Desc_wpt": null,
-        "HW_ID": "HW-01KJABRN0FEQVR2EN2M5SDKSYG"
+        "HW_ID": "HW-01KJABRN0FEQVR2EN2M5SDKSYG",
+        "planifieCounter": 0
       }
     },
     {
@@ -2402,7 +2409,8 @@
         "Temps de visite": null,
         "Prix d'entrée": null,
         "Desc_wpt": null,
-        "HW_ID": "HW-01KJABRN0GH1K6QDXPRRKMDATB"
+        "HW_ID": "HW-01KJABRN0GH1K6QDXPRRKMDATB",
+        "planifieCounter": 0
       }
     },
     {
@@ -4646,7 +4654,8 @@
         "Temps de visite": null,
         "Prix d'entrée": null,
         "Desc_wpt": null,
-        "HW_ID": "HW-01K77WPE6MK0YGY2RG0RX2XX48"
+        "HW_ID": "HW-01K77WPE6MK0YGY2RG0RX2XX48",
+        "planifieCounter": 0
       }
     },
     {
@@ -4727,7 +4736,8 @@
         "Temps de visite": null,
         "Prix d'entrée": null,
         "Desc_wpt": null,
-        "HW_ID": "HW-01K77WPE6NHCHVH0JKDTF607DG"
+        "HW_ID": "HW-01K77WPE6NHCHVH0JKDTF607DG",
+        "planifieCounter": 0
       }
     },
     {
@@ -5769,7 +5779,8 @@
         "Temps de visite": null,
         "Prix d'entrée": null,
         "Desc_wpt": null,
-        "HW_ID": "HW-01K77WPE6QE5NJP25N8WEWSR03"
+        "HW_ID": "HW-01K77WPE6QE5NJP25N8WEWSR03",
+        "planifieCounter": 0
       }
     },
     {
@@ -6329,7 +6340,8 @@
         "Temps de visite": null,
         "Prix d'entrée": null,
         "Desc_wpt": null,
-        "HW_ID": "HW-PWQM8ZZC2LR7PF4UTX73MGTM21"
+        "HW_ID": "HW-PWQM8ZZC2LR7PF4UTX73MGTM21",
+        "planifieCounter": 1
       }
     },
     {
@@ -6660,7 +6672,8 @@
         "Nom du site AR": "",
         "Catégorie": "Restaurant",
         "Zone": "Sedouikech",
-        "Description": "Restaurant de bord de plage, face à la mer"
+        "Description": "Restaurant de bord de plage, face à la mer",
+        "planifieCounter": 1
       }
     },
     {
@@ -6928,6 +6941,27 @@
         "photos": [
           "photos/poi_HW-PC-1771838835356_1771880218342.jpg"
         ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.959853573615282,
+          33.76392958395882
+        ]
+      },
+      "properties": {
+        "Nom du site FR": "Mosquée Toghrouit",
+        "Catégorie": "Mosquée",
+        "Zone": "Sedouikech",
+        "timeH": 0,
+        "timeM": 0,
+        "price": 0,
+        "HW_ID": "HW-01KJB1NZSEHQH5M3JRKS72CKRN",
+        "Description": "Ajouté via Rich Editor",
+        "planifieCounter": 0
       }
     }
   ]
