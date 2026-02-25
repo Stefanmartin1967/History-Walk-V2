@@ -776,7 +776,7 @@ function renderTab(tab) {
 
             groupHtml += items.map(item => {
                 const changeCount = item.changes.length;
-                const changeSummary = item.isCreation ? "Nouvelle création" :
+                const changeSummary = item.isCreation ? (item.isCircuit ? "Circuit créé" : "Lieu créé") :
                                       (item.isDeletion ? "Suppression demandée" :
                                       `${changeCount} modification${changeCount > 1 ? 's' : ''} (${item.changes.map(c => c.key).join(', ')})`);
 
