@@ -250,6 +250,23 @@
     ]
   },
   {
+    "id": "HW-1772053261960",
+    "name": "Circuit de Mosquée Wadran à Restaurant Port D'Aghir via Mosquée Chbêbia",
+    "file": "djerba/Circuit de Mosquée Wadran à Restaurant Port D'Aghir via Mosquée Chbêbia.gpx",
+    "description": "Circuit généré par History Walk.",
+    "distance": "8.1 km",
+    "isOfficial": true,
+    "hasRealTrack": true,
+    "zone": "Sedouikech",
+    "poiIds": [
+      "HW-01K77WPE6B2CT1A4B58N917MXQ",
+      "HW-01KJABRN0DWM059C795C8SSD8C",
+      "HW-01K77WPE6A3AYDG7D68R9A0JBT",
+      "HW-PWQM8ZZC2LR7PF4UTX73MGTM21",
+      "HW-01KJABRN0VFPFW41YCMJ2CX585"
+    ]
+  },
+  {
     "id": "HW-1771393204345",
     "name": "Circuit de Mosquée d'Ouled Hlel à Mosquée Fadhloun via Fort Sraya Ben Ayed En Ruines",
     "file": "djerba/Circuit de Mosquée d'Ouled Hlel à Mosquée Fadhloun via Fort Sraya Ben Ayed En Ruines.gpx",
