@@ -583,37 +583,45 @@ function renderTab(tab) {
              return;
         }
 
-        let html = diffData.pois.map(item => `
-            <div class="diff-entry" id="diff-card-${item.id}" style="${item.isDeletion ? 'border:1px solid #FCA5A5; background:#FEF2F2;' : (item.isCreation ? 'border:1px solid #86EFAC; background:#F0FDF4;' : '')}">
-                <div class="diff-header">
-                    <div class="diff-title" style="${item.isDeletion ? 'color:#991B1B;' : (item.isCreation ? 'color:#166534;' : '')}">
-                        <i data-lucide="${item.isDeletion ? 'trash-2' : (item.isCreation ? 'plus-circle' : 'map-pin')}" width="18" style="color:${item.isDeletion ? '#DC2626' : (item.isCreation ? '#16A34A' : 'var(--hw-amber)')};"></i>
-                        ${item.name} ${item.isDeletion ? '(SUPPRESSION)' : (item.isCreation ? '(NOUVEAU)' : '')}
+        const html = diffData.pois.map(item => {
+            const rowStyle = item.isDeletion ? 'border:1px solid #FCA5A5; background:#FEF2F2;' : (item.isCreation ? 'border:1px solid #86EFAC; background:#F0FDF4;' : '');
+            const titleStyle = item.isDeletion ? 'color:#991B1B;' : (item.isCreation ? 'color:#166534;' : '');
+            const iconName = item.isDeletion ? 'trash-2' : (item.isCreation ? 'plus-circle' : 'map-pin');
+            const iconColor = item.isDeletion ? '#DC2626' : (item.isCreation ? '#16A34A' : 'var(--hw-amber)');
+            const statusLabel = item.isDeletion ? '(SUPPRESSION)' : (item.isCreation ? '(NOUVEAU)' : '');
+
+            return `
+                <div class="diff-entry" id="diff-card-${item.id}" style="${rowStyle}">
+                    <div class="diff-header">
+                        <div class="diff-title" style="${titleStyle}">
+                            <i data-lucide="${iconName}" width="18" style="color:${iconColor};"></i>
+                            ${item.name} ${statusLabel}
+                        </div>
+                        <div class="diff-actions">
+                            <button class="btn-diff-action refuse" onclick="processDecision('${item.id}', 'refuse')">Refuser</button>
+                            <button class="btn-diff-action validate" onclick="processDecision('${item.id}', 'accept')">Valider</button>
+                        </div>
                     </div>
-                    <div class="diff-actions">
-                        <button class="btn-diff-action refuse" onclick="processDecision('${item.id}', 'refuse')">Refuser</button>
-                        <button class="btn-diff-action validate" onclick="processDecision('${item.id}', 'accept')">Valider</button>
-                    </div>
+                    ${item.changes.map(c => `
+                        <div style="margin-top:10px;">
+                            <div style="font-size:0.75rem; font-weight:800; color:var(--hw-ink-soft); margin-bottom:5px; opacity:0.6;">
+                                ${c.key ? c.key.toUpperCase() : 'PROPRIÉTÉ'}
+                            </div>
+                            <div class="diff-grid">
+                                <div class="box old">
+                                    <span class="box-label">AVANT</span>
+                                    ${c.old !== undefined ? c.old : '-'}
+                                </div>
+                                <div class="box new">
+                                    <span class="box-label">APRÈS</span>
+                                    ${c.new !== undefined ? c.new : '-'}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
-                ${item.changes.map(c => `
-                    <div style="margin-top:10px;">
-                        <div style="font-size:0.75rem; font-weight:800; color:var(--hw-ink-soft); margin-bottom:5px; opacity:0.6;">
-                            ${c.key ? c.key.toUpperCase() : 'PROPRIÉTÉ'}
-                        </div>
-                        <div class="diff-grid">
-                            <div class="box old">
-                                <span class="box-label">AVANT</span>
-                                ${c.old !== undefined ? c.old : '-'}
-                            </div>
-                            <div class="box new">
-                                <span class="box-label">APRÈS</span>
-                                ${c.new !== undefined ? c.new : '-'}
-                            </div>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `).join('');
+            `;
+        }).join('');
         container.innerHTML = html;
 
     } else if (tab === 'settings') {
