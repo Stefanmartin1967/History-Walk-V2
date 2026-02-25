@@ -272,7 +272,8 @@ export async function processImportedGpx(file, circuitId) {
                 // 1. EXTRACTION HW-ID (SÉCURITÉ)
                 // Utilisation d'une Regex sur le texte brut pour éviter les problèmes de parsing XML/Namespace
                 let foundHwId = null;
-                const idMatch = text.match(/\[HW-ID:(HW-\d+)\]/);
+                // FIX: Support des IDs alphanumériques (HW-ULID) et non plus seulement numériques
+                const idMatch = text.match(/\[HW-ID:(HW-[A-Z0-9]+)\]/);
                 if (idMatch) {
                     foundHwId = idMatch[1];
                 }
