@@ -584,11 +584,29 @@ function renderTab(tab) {
         }
 
         const html = diffData.pois.map(item => {
-            const rowStyle = item.isDeletion ? 'border:1px solid #FCA5A5; background:#FEF2F2;' : (item.isCreation ? 'border:1px solid #86EFAC; background:#F0FDF4;' : '');
-            const titleStyle = item.isDeletion ? 'color:#991B1B;' : (item.isCreation ? 'color:#166534;' : '');
-            const iconName = item.isDeletion ? 'trash-2' : (item.isCreation ? 'plus-circle' : 'map-pin');
-            const iconColor = item.isDeletion ? '#DC2626' : (item.isCreation ? '#16A34A' : 'var(--hw-amber)');
-            const statusLabel = item.isDeletion ? '(SUPPRESSION)' : (item.isCreation ? '(NOUVEAU)' : '');
+            const isMigr = item.isMigration;
+            const isDel = item.isDeletion;
+            const isCre = item.isCreation;
+
+            const rowStyle = isDel ? 'border:1px solid #FCA5A5; background:#FEF2F2;' :
+                           (isCre ? 'border:1px solid #86EFAC; background:#F0FDF4;' :
+                           (isMigr ? 'border:1px solid #BAE6FD; background:#F0F9FF;' : ''));
+
+            const titleStyle = isDel ? 'color:#991B1B;' :
+                             (isCre ? 'color:#166534;' :
+                             (isMigr ? 'color:#0369A1;' : ''));
+
+            const iconName = isDel ? 'trash-2' :
+                           (isCre ? 'plus-circle' :
+                           (isMigr ? 'refresh-cw' : 'map-pin'));
+
+            const iconColor = isDel ? '#DC2626' :
+                            (isCre ? '#16A34A' :
+                            (isMigr ? '#0284C7' : 'var(--hw-amber)'));
+
+            const statusLabel = isDel ? '(SUPPRESSION)' :
+                              (isCre ? '(NOUVEAU)' :
+                              (isMigr ? '(MIGRATION ID)' : ''));
 
             return `
                 <div class="diff-entry" id="diff-card-${item.id}" style="${rowStyle}">
