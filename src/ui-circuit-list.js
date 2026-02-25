@@ -21,6 +21,13 @@ export function initCircuitListUI() {
         }
     });
 
+    // Écouter le changement de mode Admin pour afficher/masquer les poubelles
+    eventBus.on('admin:mode-toggled', () => {
+        if (document.getElementById('explorer-list')) {
+            renderExplorerList();
+        }
+    });
+
     // Initial render of header and toolbar
     renderExplorerHeader();
     renderExplorerToolbar();
