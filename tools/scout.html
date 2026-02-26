@@ -1,37 +1,74 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self'; connect-src 'self' https://nominatim.openstreetmap.org https://overpass-api.de; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://unpkg.com 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://nominatim.openstreetmap.org https://overpass-api.de; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
     <title>History Walk - Module Scout</title>
     <link rel="icon" type="image/png" href="../icons/icon-192.png" />
     <script src="https://unpkg.com/lucide@0.395.0/dist/umd/lucide.min.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 900px; margin: auto; background: #f4f4f9; color: #333; }
-        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { margin-top: 0; color: #2563eb; display: flex; align-items: center; gap: 10px; }
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #64748b;
+            --bg: #f4f4f9;
+            --surface: #ffffff;
+            --text: #333;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; max-width: 1400px; margin: auto; background: var(--bg); color: var(--text); }
+        .card { background: var(--surface); padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        h2 { margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px; }
 
         .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
-        input[type="text"], input[type="number"] { padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; font-size: 0.9em; }
+        input[type="text"], input[type="number"] { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
 
         .row { display: flex; gap: 15px; }
         .col { flex: 1; }
 
-        .filters { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .filters { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 20px; }
         .filter-item { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
         .filter-item input { cursor: pointer; }
 
-        button { padding: 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: background 0.2s; width: 100%; font-size: 16px; }
-        .btn-primary { background: #2563eb; color: white; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-secondary { background: #64748b; color: white; margin-top: 5px; }
+        button { padding: 10px 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: all 0.2s; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: var(--secondary); color: white; }
         .btn-secondary:hover { background: #475569; }
-        .btn-success { background: #059669; color: white; display: none; margin-top: 15px; }
-        .btn-success:hover { background: #047857; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: white; padding: 6px; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; }
 
-        #log { margin-top: 20px; padding: 15px; background: #1e293b; color: #4ade80; font-family: monospace; font-size: 13px; height: 200px; overflow-y: auto; border-radius: 6px; }
-        .separator { height: 1px; background: #e2e8f0; margin: 20px 0; }
+        /* TABLE STYLES */
+        .table-container { overflow-x: auto; margin-top: 20px; border: 1px solid var(--border); border-radius: 6px; background: white; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1000px; }
+        th, td { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+        th { background: #f1f5f9; color: #475569; font-weight: 600; position: sticky; top: 0; z-index: 10; }
+        tr:hover { background: #f8fafc; }
+
+        /* Inputs in table */
+        td input, td textarea {
+            width: 100%; padding: 6px; border: 1px solid transparent; background: transparent; font-family: inherit; font-size: inherit; resize: vertical; box-sizing: border-box;
+        }
+        td input:focus, td textarea:focus { border-color: var(--primary); background: #fff; outline: none; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); border-radius: 3px; }
+        td textarea { min-height: 40px; }
+
+        .col-actions { width: 50px; text-align: center; }
+        .col-id { width: 80px; color: #94a3b8; font-family: monospace; font-size: 11px; }
+        .col-cat { width: 140px; }
+        .col-zone { width: 120px; }
+        .col-gps { width: 150px; font-family: monospace; }
+        .col-source { width: 150px; }
+
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 10px; background: #fff; border-top: 1px solid var(--border); position: sticky; bottom: 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .status-bar { font-size: 13px; color: #64748b; margin-left: 10px; }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -39,78 +76,101 @@
         <h2>🔭 Module Scout</h2>
         <p>Générez un squelette GeoJSON pour une nouvelle destination en filtrant les données OpenStreetMap.</p>
         
-        <div class="separator"></div>
-
         <!-- LOCALISATION -->
-        <div class="form-group">
-            <label>1. Définir le centre (Recherche ou Coordonnées)</label>
-            <div class="row" style="align-items: flex-end;">
-                <div class="col" style="flex: 2;">
+        <div class="row" style="align-items: flex-end; margin-bottom: 15px;">
+            <div class="col" style="flex: 2;">
+                <label>Centre (Recherche ou Coordonnées)</label>
+                <div style="display: flex; gap: 5px;">
                     <input type="text" id="location-name" placeholder="Ex: Hôtel Sindbad, Hammamet...">
-                </div>
-                <div class="col">
-                    <button id="btn-geocode" class="btn-secondary">🔍 Trouver GPS</button>
+                    <button id="btn-geocode" class="btn-secondary" title="Trouver GPS"><i data-lucide="search"></i></button>
                 </div>
             </div>
-            <div class="row" style="margin-top: 10px;">
-                <div class="col">
-                    <label style="font-size: 12px;">Latitude</label>
-                    <input type="number" id="lat" placeholder="33.xxx" step="any">
-                </div>
-                <div class="col">
-                    <label style="font-size: 12px;">Longitude</label>
-                    <input type="number" id="lon" placeholder="10.xxx" step="any">
-                </div>
+            <div class="col">
+                <label>Latitude</label>
+                <input type="number" id="lat" placeholder="33.xxx" step="any">
             </div>
-        </div>
-
-        <!-- RAYON -->
-        <div class="form-group">
-            <label>2. Rayon de recherche (Km)</label>
-            <input type="number" id="radius-km" value="3" step="0.5" min="0.1">
+            <div class="col">
+                <label>Longitude</label>
+                <input type="number" id="lon" placeholder="10.xxx" step="any">
+            </div>
+            <div class="col" style="flex: 0.5;">
+                 <label>Rayon (Km)</label>
+                 <input type="number" id="radius-km" value="3" step="0.5" min="0.1">
+            </div>
         </div>
 
         <!-- FILTRES -->
-        <div class="form-group">
-            <label>3. Catégories recherchées</label>
-            <div class="filters">
-                <label class="filter-item"><input type="checkbox" value="religion" checked> Religion (Mosquées, etc.)</label>
-                <label class="filter-item"><input type="checkbox" value="history" checked> Histoire (Forts, Ruines)</label>
-                <label class="filter-item"><input type="checkbox" value="museum" checked> Culture (Musées)</label>
-                <label class="filter-item"><input type="checkbox" value="hotel"> Hôtels</label>
-                <label class="filter-item"><input type="checkbox" value="restaurant"> Restaurants / Cafés</label>
-                <label class="filter-item"><input type="checkbox" value="leisure"> Loisirs / Jeunes (Parcs, Zoos)</label>
-                <label class="filter-item"><input type="checkbox" value="tourism"> Tourisme (Points de vue, Art)</label>
-                <label class="filter-item"><input type="checkbox" value="public"> Services Publics (Mairies, Police)</label>
-            </div>
+        <div class="filters">
+            <label class="filter-item"><input type="checkbox" value="religion" checked> Religion (Mosquées)</label>
+            <label class="filter-item"><input type="checkbox" value="history" checked> Histoire (Forts, Ruines)</label>
+            <label class="filter-item"><input type="checkbox" value="museum" checked> Culture (Musées)</label>
+            <label class="filter-item"><input type="checkbox" value="hotel"> Hôtels</label>
+            <label class="filter-item"><input type="checkbox" value="restaurant"> Restos / Cafés</label>
+            <label class="filter-item"><input type="checkbox" value="leisure"> Loisirs / Parcs</label>
+            <label class="filter-item"><input type="checkbox" value="tourism"> Tourisme / Art</label>
+            <label class="filter-item"><input type="checkbox" value="public"> Services Publics</label>
         </div>
 
-        <button id="btn-fetch" class="btn-primary">🚀 Lancer le moissonnage</button>
-        <button id="btn-download" class="btn-success">💾 Télécharger le GeoJSON</button>
+        <button id="btn-fetch" class="btn-primary" style="width: 100%;">🚀 Lancer le moissonnage</button>
+    </div>
 
-        <div id="log">En attente...</div>
+    <!-- TABLEAU DE RÉSULTATS -->
+    <div id="results-area" class="hidden">
+        <div class="table-container">
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th class="col-actions"></th>
+                        <th>Nom du site (FR)</th>
+                        <th>Nom Arabe</th>
+                        <th class="col-cat">Catégorie</th>
+                        <th class="col-zone">Zone</th>
+                        <th class="col-gps">GPS (Lat, Lon)</th>
+                        <th>Description</th>
+                        <th class="col-source">Source</th>
+                        <th class="col-id">HW_ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows generated by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="toolbar">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button id="btn-add-row" class="btn-secondary btn-sm"><i data-lucide="plus"></i> Ajouter une ligne</button>
+                <span id="row-counter" class="status-bar">0 résultats</span>
+            </div>
+            <button id="btn-download" class="btn-success"><i data-lucide="download"></i> Télécharger GeoJSON</button>
+        </div>
     </div>
 
     <script>
+        lucide.createIcons();
+
         const DOM = {
             btnGeocode: document.getElementById('btn-geocode'),
             btnFetch: document.getElementById('btn-fetch'),
             btnDownload: document.getElementById('btn-download'),
+            btnAddRow: document.getElementById('btn-add-row'),
             locName: document.getElementById('location-name'),
             lat: document.getElementById('lat'),
             lon: document.getElementById('lon'),
             radius: document.getElementById('radius-km'),
-            log: document.getElementById('log'),
-            filters: document.querySelectorAll('.filter-item input')
+            filters: document.querySelectorAll('.filter-item input'),
+            resultsArea: document.getElementById('results-area'),
+            tbody: document.querySelector('#data-table tbody'),
+            counter: document.getElementById('row-counter')
         };
 
-        let lastResult = null;
+        // --- UTILS ---
+        function generateHWID() {
+            return `HW-SCOUT-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random()*10000)}`;
+        }
 
-        function addLog(msg) { DOM.log.innerHTML += `<div>> ${msg}</div>`; DOM.log.scrollTop = DOM.log.scrollHeight; }
-
-        // --- MAPPING DES CATÉGORIES OSM -> HISTORY WALK ---
         const HW_MAPPING = {
-            'place_of_worship': 'Mosquée', // Par défaut, affiné ensuite si possible
+            'place_of_worship': 'Mosquée',
             'museum': 'Culture et tradition',
             'fort': 'Site historique',
             'castle': 'Site historique',
@@ -124,28 +184,131 @@
             'zoo': 'Curiosité',
             'viewpoint': 'Curiosité',
             'artwork': 'Curiosité',
-            'attraction': 'Curiosité'
+            'attraction': 'Curiosité',
+            'monument': 'Site historique',
+            'memorial': 'Site historique'
         };
 
         function getHwCategory(tags) {
-            // Priorité aux tags spécifiques
             if (tags.amenity === 'place_of_worship') {
                 if (tags.religion === 'muslim') return 'Mosquée';
-                if (tags.religion === 'christian') return 'Site religieux'; // Eglise
-                if (tags.religion === 'jewish') return 'Site religieux'; // Synagogue
-                return 'Mosquée'; // Par défaut dans les pays du Maghreb si non spécifié
+                if (tags.religion === 'christian' || tags.religion === 'jewish') return 'Site religieux';
+                return 'Mosquée';
             }
-
             const rawCat = tags.historic || tags.tourism || tags.amenity || tags.leisure;
             return HW_MAPPING[rawCat] || 'A définir';
         }
+
+        function createInput(value, placeholder = "") {
+            const input = document.createElement('input');
+            input.type = "text";
+            input.value = value || "";
+            input.placeholder = placeholder;
+            return input;
+        }
+
+        function createTextarea(value, placeholder = "") {
+            const input = document.createElement('textarea');
+            input.value = value || "";
+            input.placeholder = placeholder;
+            input.rows = 1;
+            return input;
+        }
+
+        // --- ROW MANAGEMENT ---
+        function addRow(data = {}) {
+            const tr = document.createElement('tr');
+
+            // 1. Actions
+            const tdActions = document.createElement('td');
+            tdActions.className = 'col-actions';
+            const btnDel = document.createElement('button');
+            btnDel.className = 'btn-danger btn-sm';
+            btnDel.innerHTML = '<i data-lucide="trash-2"></i>'; // Icon only
+            btnDel.onclick = () => { tr.remove(); updateCounter(); };
+            tdActions.appendChild(btnDel);
+            tr.appendChild(tdActions);
+
+            // 2. Nom FR
+            const tdNom = document.createElement('td');
+            tdNom.appendChild(createInput(data['Nom du site FR'], "Nom du lieu..."));
+            tr.appendChild(tdNom);
+
+            // 3. Nom Arabe
+            const tdNomAr = document.createElement('td');
+            const inputAr = createInput(data['Nom du site arabe'], "الاسم");
+            inputAr.dir = "rtl";
+            tdNomAr.appendChild(inputAr);
+            tr.appendChild(tdNomAr);
+
+            // 4. Categorie
+            const tdCat = document.createElement('td');
+            tdCat.className = 'col-cat';
+            const inputCat = createInput(data['Catégorie'], "Catégorie...");
+            inputCat.setAttribute('list', 'list-cats'); // Datalist added below
+            tdCat.appendChild(inputCat);
+            tr.appendChild(tdCat);
+
+            // 5. Zone
+            const tdZone = document.createElement('td');
+            tdZone.className = 'col-zone';
+            tdZone.appendChild(createInput(data['Zone'], "Zone..."));
+            tr.appendChild(tdZone);
+
+            // 6. GPS
+            const tdGps = document.createElement('td');
+            tdGps.className = 'col-gps';
+            tdGps.appendChild(createInput(data['Coordonnées GPS'], "Lat, Lon"));
+            tr.appendChild(tdGps);
+
+            // 7. Description
+            const tdDesc = document.createElement('td');
+            tdDesc.appendChild(createTextarea(data['Description'], "Courte description..."));
+            tr.appendChild(tdDesc);
+
+            // 8. Source
+            const tdSrc = document.createElement('td');
+            tdSrc.className = 'col-source';
+            tdSrc.appendChild(createInput(data['Source'], "URL..."));
+            tr.appendChild(tdSrc);
+
+            // 9. ID (Read only)
+            const tdId = document.createElement('td');
+            tdId.className = 'col-id';
+            const hwId = data['HW_ID'] || generateHWID();
+            tdId.textContent = hwId;
+            tdId.dataset.id = hwId; // Store in dataset
+            tr.appendChild(tdId);
+
+            DOM.tbody.appendChild(tr);
+            lucide.createIcons({ root: tr });
+            updateCounter();
+        }
+
+        function updateCounter() {
+            const count = DOM.tbody.querySelectorAll('tr').length;
+            DOM.counter.textContent = `${count} résultats`;
+        }
+
+        DOM.btnAddRow.onclick = () => {
+            const defaultZone = DOM.locName.value.split(',')[0].trim() || "A définir";
+            addRow({
+                'Zone': defaultZone,
+                'HW_ID': generateHWID()
+            });
+            // Scroll to bottom
+            DOM.tbody.lastElementChild.scrollIntoView({ behavior: 'smooth' });
+        };
 
         // --- GEOCODING ---
         DOM.btnGeocode.onclick = async () => {
             const query = DOM.locName.value;
             if (!query) return alert("Entrez un nom de lieu !");
 
-            DOM.btnGeocode.textContent = "Recherche...";
+            const originalText = DOM.btnGeocode.innerHTML;
+            DOM.btnGeocode.innerHTML = '<i data-lucide="loader-2" class="animate-spin"></i>';
+            lucide.createIcons();
+
             try {
                 const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
                 const data = await res.json();
@@ -153,15 +316,15 @@
                 
                 DOM.lat.value = data[0].lat;
                 DOM.lon.value = data[0].lon;
-                addLog(`Coordonnées trouvées : ${data[0].lat}, ${data[0].lon}`);
             } catch (err) {
                 alert("Erreur: " + err.message);
             } finally {
-                DOM.btnGeocode.textContent = "🔍 Trouver GPS";
+                DOM.btnGeocode.innerHTML = originalText;
+                lucide.createIcons();
             }
         };
 
-        // --- MOISSONNAGE ---
+        // --- FETCHING ---
         DOM.btnFetch.onclick = async () => {
             const lat = parseFloat(DOM.lat.value);
             const lon = parseFloat(DOM.lon.value);
@@ -169,87 +332,134 @@
 
             if (isNaN(lat) || isNaN(lon)) return alert("Veuillez définir un centre (Latitude/Longitude) !");
 
-            // Construction de la requête Overpass dynamique
             const activeTypes = Array.from(DOM.filters).filter(cb => cb.checked).map(cb => cb.value);
             if (activeTypes.length === 0) return alert("Sélectionnez au moins une catégorie !");
 
-            let clauses = [];
+            DOM.btnFetch.textContent = "⏳ Recherche en cours...";
+            DOM.btnFetch.disabled = true;
 
+            let clauses = [];
             // Mapping Filtres -> Clauses Overpass
             if (activeTypes.includes('religion')) clauses.push(`node["amenity"="place_of_worship"](around:${radiusMeters},${lat},${lon});`);
-
-            if (activeTypes.includes('history')) {
-                clauses.push(`node["historic"~"fort|castle|ruins|archaeological_site|monument|memorial"](around:${radiusMeters},${lat},${lon});`);
-            }
-
+            if (activeTypes.includes('history')) clauses.push(`node["historic"~"fort|castle|ruins|archaeological_site|monument|memorial"](around:${radiusMeters},${lat},${lon});`);
             if (activeTypes.includes('museum')) clauses.push(`node["tourism"="museum"](around:${radiusMeters},${lat},${lon});`);
-
             if (activeTypes.includes('hotel')) clauses.push(`node["tourism"~"hotel|guest_house|hostel"](around:${radiusMeters},${lat},${lon});`);
-
             if (activeTypes.includes('restaurant')) clauses.push(`node["amenity"~"restaurant|cafe"](around:${radiusMeters},${lat},${lon});`);
-
             if (activeTypes.includes('leisure')) {
                 clauses.push(`node["leisure"~"park|water_park"](around:${radiusMeters},${lat},${lon});`);
                 clauses.push(`node["tourism"~"theme_park|zoo|aquarium"](around:${radiusMeters},${lat},${lon});`);
             }
-
-            if (activeTypes.includes('tourism')) {
-                clauses.push(`node["tourism"~"viewpoint|artwork|attraction|gallery"](around:${radiusMeters},${lat},${lon});`);
-            }
-
-            if (activeTypes.includes('public')) {
-                clauses.push(`node["amenity"~"townhall|police|post_office|library"](around:${radiusMeters},${lat},${lon});`);
-            }
+            if (activeTypes.includes('tourism')) clauses.push(`node["tourism"~"viewpoint|artwork|attraction|gallery"](around:${radiusMeters},${lat},${lon});`);
+            if (activeTypes.includes('public')) clauses.push(`node["amenity"~"townhall|police|post_office|library"](around:${radiusMeters},${lat},${lon});`);
 
             const query = `[out:json];(${clauses.join('')});out body;`;
-
-            addLog("Envoi de la requête Overpass...");
-            addLog(`Centre: ${lat}, ${lon} | Rayon: ${DOM.radius.value} km`);
 
             try {
                 const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
                 const data = await res.json();
                 
-                const features = data.elements.map(el => {
-                    const category = getHwCategory(el.tags);
+                // Clear table
+                DOM.tbody.innerHTML = '';
+                DOM.resultsArea.classList.remove('hidden');
 
-                    return {
-                        type: "Feature",
-                        geometry: { type: "Point", coordinates: [el.lon, el.lat] },
-                        properties: {
-                            "Nom du site FR": el.tags.name || el.tags["name:fr"] || "Sans nom",
-                            "Nom du site arabe": el.tags["name:ar"] || "",
-                            "Catégorie": category,
-                            "Zone": DOM.locName.value.split(',')[0] || "A définir",
-                            "Description": el.tags.description || "",
-                            "Source": "OpenStreetMap",
-                            "Coordonnées GPS": `${el.lat}, ${el.lon}`,
-                            "Latitude": el.lat,
-                            "Longitude": el.lon,
-                            "HW_ID": `HW-SCOUT-${Date.now()}-${Math.floor(Math.random()*10000)}`
-                        }
+                const defaultZone = DOM.locName.value.split(',')[0].trim() || "A définir";
+
+                data.elements.forEach(el => {
+                    const rowData = {
+                        "Nom du site FR": el.tags.name || el.tags["name:fr"] || "", // Laisse vide si pas de nom, pour inciter à remplir
+                        "Nom du site arabe": el.tags["name:ar"] || "",
+                        "Catégorie": getHwCategory(el.tags),
+                        "Zone": defaultZone,
+                        "Description": el.tags.description || "",
+                        "Source": "OpenStreetMap",
+                        "Coordonnées GPS": `${el.lat}, ${el.lon}`,
+                        "HW_ID": generateHWID()
                     };
+                    addRow(rowData);
                 });
 
-                lastResult = { type: "FeatureCollection", features };
-                addLog(`✅ Succès ! ${features.length} POI trouvés.`);
-                DOM.btnDownload.style.display = 'block';
+                if (data.elements.length === 0) alert("Aucun résultat trouvé dans ce rayon.");
 
             } catch (err) {
-                addLog(`❌ ERREUR : ${err.message}`);
+                alert("Erreur lors de la récupération : " + err.message);
+            } finally {
+                DOM.btnFetch.textContent = "🚀 Lancer le moissonnage";
+                DOM.btnFetch.disabled = false;
             }
         };
 
+        // --- DOWNLOAD ---
         DOM.btnDownload.onclick = () => {
-            if(!lastResult) return;
-            const blob = new Blob([JSON.stringify(lastResult, null, 2)], {type: "application/json"});
+            const features = [];
+            const rows = DOM.tbody.querySelectorAll('tr');
+
+            rows.forEach(tr => {
+                const inputs = tr.querySelectorAll('input, textarea');
+                // Index mapping based on creation order in addRow:
+                // 0: Nom FR, 1: Nom Arabe, 2: Categorie, 3: Zone, 4: GPS, 5: Desc, 6: Source
+
+                const nom = inputs[0].value;
+                const nomAr = inputs[1].value;
+                const cat = inputs[2].value;
+                const zone = inputs[3].value;
+                const gps = inputs[4].value;
+                const desc = inputs[5].value;
+                const src = inputs[6].value;
+                const id = tr.querySelector('.col-id').textContent;
+
+                if (!gps.includes(',')) return; // Skip invalid GPS
+                const [latStr, lonStr] = gps.split(',').map(s => s.trim());
+                const lat = parseFloat(latStr);
+                const lon = parseFloat(lonStr);
+
+                if (isNaN(lat) || isNaN(lon)) return;
+
+                features.push({
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [lon, lat] // GeoJSON is Lon, Lat
+                    },
+                    properties: {
+                        "Nom du site FR": nom,
+                        "Nom du site arabe": nomAr,
+                        "Catégorie": cat,
+                        "Zone": zone,
+                        "Coordonnées GPS": gps,
+                        "Latitude": lat,
+                        "Longitude": lon,
+                        "Description": desc,
+                        "Source": src,
+                        "Temps de visite": null,
+                        "Prix d'entrée": null,
+                        "Desc_wpt": null,
+                        "HW_ID": id
+                    }
+                });
+            });
+
+            if(features.length === 0) return alert("Le tableau est vide !");
+
+            const collection = { type: "FeatureCollection", features };
+            const blob = new Blob([JSON.stringify(collection, null, 2)], {type: "application/json"});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             const name = DOM.locName.value ? DOM.locName.value.replace(/[^a-z0-9]/gi, '_') : 'Search';
-            a.download = `Scout_${name}.geojson`;
+            a.download = `Scout_${name}_v1.geojson`;
             a.click();
         };
+
+        // Add datalist for categories
+        const dl = document.createElement('datalist');
+        dl.id = 'list-cats';
+        ['Mosquée', 'Site historique', 'Culture et tradition', 'Hôtel', 'Restaurant', 'Curiosité', 'Site religieux'].forEach(c => {
+            const op = document.createElement('option');
+            op.value = c;
+            dl.appendChild(op);
+        });
+        document.body.appendChild(dl);
+
     </script>
 </body>
 </html>
