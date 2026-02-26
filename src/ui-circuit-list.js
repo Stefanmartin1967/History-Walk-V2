@@ -1,10 +1,11 @@
 import { state } from './state.js';
 import { escapeXml } from './utils.js';
 import { eventBus } from './events.js';
-import { showConfirm } from './modal.js';
+import { showConfirm, showCustomModal, closeModal } from './modal.js';
 import { createIcons, icons } from 'lucide';
-import { getProcessedCircuits } from './circuit-list-service.js';
+import { getProcessedCircuits, getAvailableZonesFromCircuits } from './circuit-list-service.js';
 import { handleCircuitVisitedToggle } from './circuit-actions.js';
+import { applyFilters } from './data.js';
 
 // --- LOCAL STATE ---
 // Sort: 'date_desc', 'date_asc', 'dist_asc', 'dist_desc'
@@ -93,6 +94,8 @@ function renderExplorerToolbar() {
         ? (currentSort === 'dist_desc' ? 'arrow-up-1-0' : 'arrow-down-0-1')
         : 'ruler';
 
+    const zoneActive = !!(state.activeFilters && state.activeFilters.zone);
+
     footer.innerHTML = `
         <button id="btn-sort-date" class="footer-btn icon-only ${currentSort.startsWith('date') ? 'active' : ''}" title="Trier par date">
             <i data-lucide="${dateIcon}"></i>
@@ -102,6 +105,10 @@ function renderExplorerToolbar() {
         </button>
 
         <div class="separator-vertical"></div>
+
+        <button id="btn-filter-zone" class="footer-btn icon-only ${zoneActive ? 'active' : ''}" title="Filtrer par Zone">
+            <i data-lucide="map-pin"></i>
+        </button>
 
         <button id="btn-filter-todo" class="footer-btn icon-only ${filterTodo ? 'active' : ''}" title="A faire">
             <i data-lucide="${filterTodo ? 'list-todo' : 'list-checks'}"></i>
@@ -129,6 +136,10 @@ function renderExplorerToolbar() {
         refreshExplorer();
     });
 
+    footer.querySelector('#btn-filter-zone').addEventListener('click', () => {
+        openZonesModalPC();
+    });
+
     footer.querySelector('#btn-filter-todo').addEventListener('click', () => {
         filterTodo = !filterTodo;
         refreshExplorer();
@@ -137,8 +148,75 @@ function renderExplorerToolbar() {
     footer.querySelector('#btn-reset-filters').addEventListener('click', () => {
         currentSort = 'date_desc';
         filterTodo = false;
+        state.activeFilters.zone = null; // Reset Zone Filter
+        applyFilters(); // Apply globally
         refreshExplorer();
     });
+}
+
+function openZonesModalPC() {
+    const { zoneCounts, sortedZones } = getAvailableZonesFromCircuits();
+
+    // Construction de la modale
+    const content = document.createElement('div');
+    content.style.display = 'flex';
+    content.style.flexDirection = 'column';
+    content.style.gap = '10px';
+    content.style.maxHeight = '60vh';
+    content.style.overflowY = 'auto';
+
+    // Option "Toutes"
+    const btnAll = document.createElement('button');
+    btnAll.className = 'explorer-item'; // Reuse item style for buttons
+    btnAll.style.padding = '10px';
+    btnAll.style.textAlign = 'left';
+    btnAll.style.background = 'var(--surface)';
+    btnAll.style.border = '1px solid var(--line)';
+    btnAll.style.borderRadius = '8px';
+    btnAll.style.cursor = 'pointer';
+
+    btnAll.innerHTML = `<span>Toutes les zones</span>`;
+    btnAll.onclick = () => {
+        state.activeFilters.zone = null;
+        applyFilters(); // Updates map and triggers list refresh
+        closeModal();
+    };
+    content.appendChild(btnAll);
+
+    sortedZones.forEach(zone => {
+        const btn = document.createElement('button');
+        btn.className = 'explorer-item';
+        btn.style.padding = '10px';
+        btn.style.textAlign = 'left';
+        btn.style.background = 'var(--surface)';
+        btn.style.border = '1px solid var(--line)';
+        btn.style.borderRadius = '8px';
+        btn.style.cursor = 'pointer';
+        btn.style.display = 'flex';
+        btn.style.justifyContent = 'space-between';
+
+        btn.innerHTML = `<span>${zone}</span> <span style="font-weight:bold; color:var(--ink-soft);">${zoneCounts[zone]}</span>`;
+
+        if (state.activeFilters.zone === zone) {
+            btn.style.border = '2px solid var(--brand)';
+            btn.style.background = 'var(--surface-muted)';
+        }
+
+        btn.onclick = () => {
+            state.activeFilters.zone = zone;
+            applyFilters();
+            closeModal();
+        };
+        content.appendChild(btn);
+    });
+
+    // 3. Affichage via showCustomModal
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'custom-modal-btn secondary';
+    closeBtn.textContent = 'Fermer';
+    closeBtn.onclick = () => closeModal();
+
+    showCustomModal("Filtrer par Zone", content, closeBtn);
 }
 
 function refreshExplorer() {
