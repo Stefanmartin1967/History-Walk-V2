@@ -3,13 +3,10 @@ import { state } from './state.js';
 import { deleteCircuitById, softDeleteCircuit } from './database.js';
 import { clearCircuit, setCircuitVisitedState } from './circuit.js';
 import { recalculatePlannedCountersForMap } from './gpx.js';
-import { applyFilters } from './data.js';
+import { applyFilters, getPoiId } from './data.js';
 import { isMobileView } from './mobile.js';
+import { showConfirm } from './modal.js';
 
-/**
- * Logique métier pour supprimer un circuit
- * Gère la base de données, l'état mémoire et les calculs GPX
- */
 /**
  * Logique métier pour supprimer un circuit
  * Gère la base de données, l'état mémoire et les calculs GPX
@@ -67,6 +64,10 @@ export async function performCircuitDeletion(id) {
     }
 }
 
+/**
+ * Change le statut visité d'un circuit sans confirmation (Low-level).
+ * @deprecated Utilisez handleCircuitVisitedToggle pour l'action utilisateur avec UI.
+ */
 export async function toggleCircuitVisitedStatus(circuitId, isChecked) {
     try {
         await setCircuitVisitedState(circuitId, isChecked);
@@ -77,7 +78,36 @@ export async function toggleCircuitVisitedStatus(circuitId, isChecked) {
     }
 }
 
-import { getPoiId } from './data.js'; // Assurez-vous d'ajouter getPoiId aux imports en haut
+/**
+ * Gère l'action utilisateur de bascule du statut "Fait" d'un circuit avec dialogues de confirmation.
+ * @param {string} circuitId
+ * @param {boolean} currentStatus - Le statut actuel (avant le clic) : true = Déjà fait (on veut décocher), false = Pas fait (on veut cocher)
+ * @returns {Promise<{success: boolean, newState?: boolean}>}
+ */
+export async function handleCircuitVisitedToggle(circuitId, currentStatus) {
+    try {
+        if (currentStatus) {
+             // Il est coché, on veut le décocher
+             if (await showConfirm("Réinitialisation", "Voulez-vous vraiment décocher tous les lieux (remettre à 'Non visité') ?", "Tout décocher", "Annuler", true)) {
+                 await setCircuitVisitedState(circuitId, false);
+                 return { success: true, newState: false };
+             }
+        } else {
+             // Il n'est pas coché, on veut le cocher
+             if (await showConfirm("Circuit Terminé", "Bravo ! Marquer tous les lieux de ce circuit comme visités ?", "Tout cocher", "Annuler")) {
+                 await setCircuitVisitedState(circuitId, true);
+                 return { success: true, newState: true };
+             }
+        }
+        // Annulation par l'utilisateur
+        return { success: false };
+
+    } catch (error) {
+        console.error("Erreur toggle circuit visited:", error);
+        return { success: false };
+    }
+}
+
 
 /**
  * Prépare les données des zones : filtre les POI et compte les occurrences par zone
