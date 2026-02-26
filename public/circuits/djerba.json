@@ -161,6 +161,24 @@
     ]
   },
   {
+    "id": "HW-1772139072899",
+    "name": "Circuit de Mosquée Khaled Ibn Elwalid à Mosquée Trojette via Mosquée Ben Achour",
+    "file": "djerba/Circuit de Mosquée Khaled Ibn Elwalid à Mosquée Trojette via Mosquée Ben Achour.gpx",
+    "description": "Circuit généré par History Walk.",
+    "distance": "7.2 km",
+    "isOfficial": true,
+    "hasRealTrack": true,
+    "zone": "Taguermess",
+    "poiIds": [
+      "HW-01K77WPE68SW9XWBFFCRBWXZYM",
+      "HW-01K77WPE6805D82JWX44QAVVV9",
+      "HW-01K77WPE68ZXYA0Z9T3QEN0VYW",
+      "HW-01K77WPE6QS9TJZYHXPSJKW47P",
+      "HW-01K77WPE6QGFPEGPTZ1G59C9FZ",
+      "HW-01K77WPE67YEYJ337ADV7QBX5P"
+    ]
+  },
+  {
     "id": "HW-1771317964994",
     "name": "Circuit de Mosquée Ouilihi à Mosquée  Berdaoui via Mosquée Mourou",
     "file": "djerba/Circuit de Mosquée Ouilihi à Mosquée  Berdaoui via Mosquée Mourou.gpx",
