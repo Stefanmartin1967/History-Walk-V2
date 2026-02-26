@@ -15,6 +15,8 @@ import { showToast } from './toast.js';
 import { showConfirm, showCustomModal, closeModal } from './modal.js';
 import { getSearchResults } from './search.js';
 import { showStatisticsModal } from './statistics.js';
+import { getProcessedCircuits } from './circuit-list-service.js';
+import { handleCircuitVisitedToggle } from './circuit-actions.js';
 
 let currentView = 'circuits'; 
 let mobileSort = 'date_desc'; // date_desc, date_asc, dist_asc, dist_desc
@@ -79,7 +81,7 @@ export function initMobileMode() {
             // 6. DESSIN DES ICÔNES ICI (À l'intérieur du clic)
             createIcons({ icons, root: newFilterBtn });
 
-        }); // <-- FIN DU CLIC DÉPLACÉE ICI
+        });
     }
 
     switchMobileView('circuits');
@@ -191,93 +193,9 @@ async function handleAddPoiClick() {
 export function renderMobileCircuitsList() {
     const container = document.getElementById('mobile-main-container');
     
-    // 1. Fusion des listes (Officiels + Locaux)
-    const officialCircuits = state.officialCircuits || [];
-    const localCircuits = (state.myCircuits || []).filter(c => {
-        if (c.isDeleted) return false;
-
-        // DEDUPLICATION : On cache le circuit local si un officiel existe déjà avec le même ID
-        // ou le même nom (au cas où l'ID aurait changé lors d'un vieil import)
-        const existsInOfficial = officialCircuits.some(off =>
-            String(off.id) === String(c.id) ||
-            (off.name && c.name && off.name.trim() === c.name.trim())
-        );
-        return !existsInOfficial;
-    });
-
-    // On combine : Officiels d'abord
-    let allCircuits = [...officialCircuits, ...localCircuits];
-
-    let circuitsToDisplay = allCircuits;
-
-    // 2. Préparation des données pour tri/filtre
-    // On enrichit d'abord pour pouvoir trier
-    let enrichedCircuits = circuitsToDisplay.map(c => {
-        const validPois = c.poiIds
-            .map(id => state.loadedFeatures.find(feat => getPoiId(feat) === id))
-            .filter(f => f);
-            
-        // Distance
-        let dist = 0;
-
-        // CORRECTION: Priorité à la distance officielle déclarée (pour éviter 3.8km => 1.6km si calcul orthodromique)
-        if (c.distance && typeof c.distance === 'string') {
-            const parsed = parseFloat(c.distance.replace(',', '.').replace(/[^\d.]/g, ''));
-            if (!isNaN(parsed) && parsed > 0) dist = parsed * 1000;
-        }
-
-        if (dist === 0 && c.realTrack) {
-            dist = getRealDistance(c);
-        }
-
-        if (dist === 0) {
-            dist = getOrthodromicDistance(validPois);
-        }
-
-        // Restaurant
-        const hasRestaurant = validPois.some(f => {
-            const cat = f.properties['Catégorie'] || f.properties.userData?.Catégorie;
-            return cat === 'Restaurant';
-        });
-
-        // Visited status
-        const allVisited = isCircuitCompleted(c);
-
-        return {
-            ...c,
-            _validPois: validPois,
-            _dist: dist,
-            _hasRestaurant: hasRestaurant,
-            _allVisited: allVisited
-        };
-    });
-
-    // 3. Filtrage
-    if (state.filterCompleted) {
-        enrichedCircuits = enrichedCircuits.filter(c => !c._allVisited);
-    }
-    if (state.activeFilters && state.activeFilters.zone) {
-        enrichedCircuits = enrichedCircuits.filter(c => {
-            if (c._validPois.length === 0) return false;
-            const startPoi = c._validPois[0];
-            const [lng, lat] = startPoi.geometry.coordinates;
-            const z = getZoneFromCoords(lat, lng);
-            return z === state.activeFilters.zone;
-        });
-    }
-
-    // 4. Tri
-    if (mobileSort === 'date_desc') {
-        enrichedCircuits.reverse();
-    } else if (mobileSort === 'date_asc') {
-        // Déjà dans l'ordre chronologique (par défaut)
-    } else if (mobileSort === 'dist_asc') {
-        enrichedCircuits.sort((a, b) => a._dist - b._dist);
-    } else if (mobileSort === 'dist_desc') {
-        enrichedCircuits.sort((a, b) => b._dist - a._dist);
-    }
-
-    circuitsToDisplay = enrichedCircuits;
+    // --- USE SHARED SERVICE ---
+    // Note: We use the local mobileSort, but we assume state.activeFilters.zone is shared or relevant
+    const circuitsToDisplay = getProcessedCircuits(mobileSort, state.filterCompleted, state.activeFilters.zone || null);
 
     let html = `
         <div class="mobile-view-header mobile-header-harmonized">
@@ -287,7 +205,10 @@ export function renderMobileCircuitsList() {
         <div class="panel-content mobile-standard-padding mobile-list-container">
     `;
 
-    if (allCircuits.length === 0) {
+    // Empty state logic is simpler now, but we need to check if *any* circuits exist before filtering to show the correct empty message
+    const hasAnyCircuits = (state.officialCircuits?.length || 0) + (state.myCircuits?.length || 0) > 0;
+
+    if (!hasAnyCircuits) {
         html += `<p class="mobile-empty-state">
             Aucun circuit enregistré.<br>
             Utilisez le menu <b>Menu > Restaurer</b> pour charger une sauvegarde.
@@ -303,43 +224,14 @@ export function renderMobileCircuitsList() {
     } else {
         html += `<div class="mobile-list">`;
         circuitsToDisplay.forEach(circuit => {
-            const validPois = circuit.poiIds.map(id => state.loadedFeatures.find(f => getPoiId(f) === id)).filter(f => f);
-            const total = validPois.length;
-            const done = validPois.filter(f => f.properties.userData?.vu).length;
-            const isDone = (total > 0 && total === done);
-            
-            // Calculs Métadonnées
-            let distance = 0;
-
-            // CORRECTION: Priorité à la distance officielle déclarée
-            if (circuit.distance && typeof circuit.distance === 'string') {
-                const parsed = parseFloat(circuit.distance.replace(',', '.').replace(/[^\d.]/g, ''));
-                if (!isNaN(parsed) && parsed > 0) distance = parsed * 1000;
-            }
-
-            if (distance === 0 && circuit.realTrack) {
-                distance = getRealDistance(circuit);
-            }
-
-            if (distance === 0) {
-                distance = getOrthodromicDistance(validPois);
-            }
-
-            const distDisplay = (distance / 1000).toFixed(1) + ' km';
-
-            let zoneName = circuit.zone || "Zone Inconnue";
-            if (validPois.length > 0) {
-                const firstPoi = validPois[0];
-                const [lng, lat] = firstPoi.geometry.coordinates;
-                zoneName = getZoneFromCoords(lat, lng);
-            } else if (circuit.realTrack && circuit.realTrack.length > 0) {
-                // Fallback: Si pas de POI liés, on utilise le premier point de la trace réelle
-                // realTrack est au format [[lat, lng], ...]
-                const [lat, lng] = circuit.realTrack[0];
-                zoneName = getZoneFromCoords(lat, lng);
-            }
-
+            // Using enriched properties from getProcessedCircuits
+            const distDisplay = circuit._distDisplay;
+            const zoneName = circuit._zoneName;
             const displayName = circuit.name.split(' via ')[0];
+            const total = circuit._poiCount;
+            const done = circuit._visitedCount;
+            const isDone = circuit._isCompleted;
+            const iconName = circuit._iconName;
 
             const statusIcon = isDone 
                 ? `<i data-lucide="check-circle" style="color:var(--ok); width:20px; height:20px;"></i>`
@@ -354,40 +246,22 @@ export function renderMobileCircuitsList() {
                 ? `<i data-lucide="utensils" style="width:14px; height:14px; margin-left:4px; vertical-align:text-bottom;"></i>`
                 : '';
 
-        // Icone Bird/Foot
-        // PRIORITÉ ICÔNE :
-        // 1. Si on a des données de trace chargées (realTrack) -> FOOT
-        // 2. Si on a un flag dans le JSON disant qu'il y a une trace (hasRealTrack) -> FOOT
-        // 3. Sinon -> BIRD
-        let iconName = 'bird';
-        if (circuit.realTrack && circuit.realTrack.length > 0) {
-            iconName = 'footprints';
-        } else if (circuit.hasRealTrack) {
-            iconName = 'footprints';
-        }
+            const nameStyle = circuit.isOfficial ? 'font-weight:700;' : 'font-weight:400;';
 
-        // Style du nom (Gras pour Officiel, Normal pour User)
-        const nameStyle = circuit.isOfficial ? 'font-weight:700;' : 'font-weight:400;';
-
-        // Action Droite (Chevron ou Téléchargement GPX pour Officiels)
-        let rightActionHtml = '';
-        if (circuit.isOfficial && circuit.file) {
-            // Le chevron est remplacé par le bouton de téléchargement
-            // NOTE: On supprime EXPLICITEMENT tout chevron ici
-            rightActionHtml = `
-            <a href="./circuits/${circuit.file}" download title="Télécharger GPX" class="mobile-download-btn" onclick="event.stopPropagation();">
-                <i data-lucide="download" style="width:24px; height:24px;"></i>
-            </a>`;
-        } else {
-            // Sinon, aucun chevron (Zone cliquable globale suffit)
-            rightActionHtml = '';
-        }
+            // Action Droite (Téléchargement GPX pour Officiels)
+            let rightActionHtml = '';
+            if (circuit.isOfficial && circuit.file) {
+                rightActionHtml = `
+                <a href="./circuits/${circuit.file}" download title="Télécharger GPX" class="mobile-download-btn" onclick="event.stopPropagation();">
+                    <i data-lucide="download" style="width:24px; height:24px;"></i>
+                </a>`;
+            }
 
             // Bouton Visité (Gauche)
-            const visitedIcon = circuit._allVisited ? 'check-circle' : 'circle';
-            const visitedColor = circuit._allVisited ? 'var(--ok)' : 'var(--line)'; // Gris clair si pas fait, Vert si fait
+            const visitedIcon = isDone ? 'check-circle' : 'circle';
+            const visitedColor = isDone ? 'var(--ok)' : 'var(--line)'; // Gris clair si pas fait, Vert si fait
             const toggleVisitedHtml = `
-                <div class="mobile-toggle-visited mobile-check-btn" data-id="${circuit.id}" data-visited="${circuit._allVisited}" style="color:${visitedColor};" onclick="event.stopPropagation();">
+                <div class="mobile-toggle-visited mobile-check-btn" data-id="${circuit.id}" data-visited="${isDone}" style="color:${visitedColor};" onclick="event.stopPropagation();">
                     <i data-lucide="${visitedIcon}" style="width:24px; height:24px;"></i>
                 </div>
             `;
@@ -396,7 +270,7 @@ export function renderMobileCircuitsList() {
                 <div style="display:flex; align-items:center; gap:5px; margin-bottom:8px;">
                     <div class="mobile-list-item circuit-item-mobile mobile-card-layout" data-id="${circuit.id}" role="button" tabindex="0">
                         ${toggleVisitedHtml}
-                        <div style="display:flex; flex-direction:column; flex:1; min-width:0; margin-right:4px;"> <!-- Marge droite réduite -->
+                        <div style="display:flex; flex-direction:column; flex:1; min-width:0; margin-right:4px;">
                             <div style="display:flex; align-items:center; width:100%;">
                                 <span style="${nameStyle} font-size:16px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">${escapeHtml(displayName)}</span>
                             </div>
@@ -446,16 +320,10 @@ export function renderMobileCircuitsList() {
             const id = btn.dataset.id;
             const isVisited = btn.dataset.visited === 'true';
 
-            if(isVisited) {
-                 if(await showConfirm("Réinitialisation", "Voulez-vous vraiment décocher tous les lieux (remettre à 'Non visité') ?", "Tout décocher", "Annuler", true)) {
-                     await setCircuitVisitedState(id, false);
-                     renderMobileCircuitsList(); // Refresh UI
-                 }
-            } else {
-                 if(await showConfirm("Circuit Terminé", "Bravo ! Marquer tous les lieux de ce circuit comme visités ?", "Tout cocher", "Annuler")) {
-                     await setCircuitVisitedState(id, true);
-                     renderMobileCircuitsList(); // Refresh UI
-                 }
+            // Unified Action with Confirmation
+            const result = await handleCircuitVisitedToggle(id, isVisited);
+            if (result.success) {
+                renderMobileCircuitsList(); // Refresh UI
             }
         });
     });
@@ -535,6 +403,8 @@ function renderMobileToolbar() {
 
 function renderMobileZonesMenu() {
     // 1. Calcul des zones disponibles basées sur les circuits
+    // TODO: We could use getProcessedCircuits here too to be super clean, but this logic is specific for zone counting
+    // Let's keep it as is for now, it iterates all circuits.
     const zonesMap = {};
     const officialCircuits = state.officialCircuits || [];
     const localCircuits = state.myCircuits || [];
@@ -705,15 +575,18 @@ export function renderMobilePoiList(features) {
             const btnToggle = document.getElementById('btn-toggle-visited');
             if(btnToggle) {
                 btnToggle.addEventListener('click', async () => {
-                    const newState = !isAllVisited; 
-                    if(newState) {
-                         if(await showConfirm("Circuit Terminé", "Bravo ! Marquer tous les lieux de ce circuit comme visités ?", "Tout cocher", "Annuler")) {
-                             await setCircuitVisitedState(state.activeCircuitId, true);
-                         }
-                    } else {
-                         if(await showConfirm("Réinitialisation", "Voulez-vous vraiment décocher tous les lieux (remettre à 'Non visité') ?", "Tout décocher", "Annuler", true)) {
-                             await setCircuitVisitedState(state.activeCircuitId, false);
-                         }
+                    // Reuse unified interaction here too? Yes, but this is Circuit Detail view, not list view.
+                    // state.activeCircuitId is set.
+                    // We can reuse handleCircuitVisitedToggle(state.activeCircuitId, isAllVisited)
+
+                    const result = await handleCircuitVisitedToggle(state.activeCircuitId, isAllVisited);
+                    if (result.success) {
+                        // Refresh POI List
+                        // We need to re-render renderMobilePoiList with updated features (visited status changes)
+                        // But features passed as argument 'features' are static?
+                        // Actually renderMobilePoiList takes 'features'.
+                        // Ideally we should reload the circuit.
+                        await loadCircuitById(state.activeCircuitId);
                     }
                 });
             }
