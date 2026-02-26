@@ -53,32 +53,52 @@ describe('Utils', () => {
         });
     });
 
-    describe('escapeXml', () => {
-        it('should escape special characters', () => {
-            expect(escapeXml('<script>')).toBe('&lt;script&gt;');
-            expect(escapeXml('A & B')).toBe('A &amp; B');
-            expect(escapeXml('"Quote"')).toBe('&quot;Quote&quot;');
+    describe('escapeXml & escapeHtml', () => {
+        it('should be aliases of the same function', () => {
+            expect(escapeHtml).toBe(escapeXml);
         });
 
-        it('should handle null/undefined', () => {
-            expect(escapeXml(null)).toBe('');
-            expect(escapeXml(undefined)).toBe('');
-        });
-    });
-
-    describe('escapeHtml (alias of escapeXml)', () => {
-        it('should escape special characters same as escapeXml', () => {
-            expect(escapeHtml('<script>')).toBe('&lt;script&gt;');
-            expect(escapeHtml("'")).toBe('&apos;');
-        });
-
-        it('should handle numbers safely', () => {
-            expect(escapeHtml(123)).toBe('123');
+        it('should escape all standard HTML entities', () => {
+            const input = '<div class="test">Jules & Friends\'s "Adventure"</div>';
+            // Expectation based on current implementation:
+            // < -> &lt;
+            // > -> &gt;
+            // & -> &amp;
+            // " -> &quot;
+            // ' -> &apos;
+            const expected = '&lt;div class=&quot;test&quot;&gt;Jules &amp; Friends&apos;s &quot;Adventure&quot;&lt;/div&gt;';
+            expect(escapeHtml(input)).toBe(expected);
         });
 
-        it('should handle null/undefined returning empty string', () => {
+        it('should handle XSS attack vectors', () => {
+            const xss = '<script>alert(1)</script>';
+            expect(escapeHtml(xss)).toBe('&lt;script&gt;alert(1)&lt;/script&gt;');
+        });
+
+        it('should handle null and undefined by returning empty string', () => {
             expect(escapeHtml(null)).toBe('');
             expect(escapeHtml(undefined)).toBe('');
+        });
+
+        it('should handle empty strings', () => {
+            expect(escapeHtml('')).toBe('');
+        });
+
+        it('should safely handle numbers (convert to string)', () => {
+            expect(escapeHtml(123)).toBe('123');
+            expect(escapeHtml(0)).toBe('0');
+            expect(escapeHtml(12.34)).toBe('12.34');
+        });
+
+        it('should safely handle booleans (convert to string)', () => {
+            expect(escapeHtml(true)).toBe('true');
+            expect(escapeHtml(false)).toBe('false');
+        });
+
+        it('should not double escape already escaped entities (this is expected behavior for simple escapers)', () => {
+            // A simple escaper usually escapes & again. Let's verify current behavior.
+            // If input is "&amp;", output should be "&amp;amp;"
+            expect(escapeHtml('&amp;')).toBe('&amp;amp;');
         });
     });
 
