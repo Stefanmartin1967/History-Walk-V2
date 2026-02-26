@@ -254,12 +254,11 @@ export function renderExplorerList() {
     listContainer.innerHTML = (processedCircuits.length === 0)
         ? '<div style="padding:20px; text-align:center; color:var(--ink-soft);">Aucun circuit correspondant.</div>'
         : processedCircuits.map(c => {
-            const displayName = c.name.split(' via ')[0];
+            // Simplification du nom : Suppression des préfixes et du via
+            let displayName = c.name.split(' via ')[0];
+            displayName = displayName.replace(/^(Circuit de |Boucle de )/i, '');
 
-            // Indicateur Officiel
-            const officialIcon = c.isOfficial
-                ? `<i data-lucide="star" style="width:14px; height:14px; color:var(--primary); fill:var(--primary); margin-left:4px;"></i>`
-                : '';
+            // Pas d'icône étoile pour gagner de la place (Demande utilisateur)
 
             // Actions : Suppression interdite pour les officiels (sauf Admin)
             // UPDATE: Masqué par défaut dans la liste pour éviter les erreurs. La suppression reste possible dans le détail.
@@ -287,7 +286,10 @@ export function renderExplorerList() {
                 ? `<i data-lucide="utensils" style="width:14px; height:14px; vertical-align:text-bottom; margin-left:4px;" title="Restaurant présent"></i>`
                 : '';
 
-            const nameStyle = c.isOfficial ? 'font-weight:700;' : 'font-weight:400;';
+            // Style : Officiels en couleur brand, Personnels en noir. Police plus petite, 2 lignes max.
+            const nameColor = c.isOfficial ? 'var(--primary)' : 'var(--ink)';
+            const nameWeight = c.isOfficial ? '500' : '400';
+            const nameStyle = `font-weight:${nameWeight}; font-size:14px; color:${nameColor}; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; white-space:normal; line-height:1.2;`;
 
             // UNIFIED "CARD" LAYOUT (Sidebar Version)
             return `
@@ -299,11 +301,10 @@ export function renderExplorerList() {
 
                 <!-- Center: Info -->
                 <div class="explorer-item-content" style="flex:1; min-width:0;">
-                    <div class="explorer-item-name" title="${escapeXml(c.name)}" style="${nameStyle} font-size:15px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <div class="explorer-item-name" title="${escapeXml(c.name)}" style="${nameStyle}">
                         ${escapeXml(displayName)}
-                        ${officialIcon}
                     </div>
-                    <div class="explorer-item-meta" style="font-size:12px; color:var(--ink-soft); display:flex; align-items:center;">
+                    <div class="explorer-item-meta" style="font-size:12px; color:var(--ink-soft); display:flex; align-items:center; margin-top:2px;">
                         ${c._poiCount} POI • ${c._distDisplay} <i data-lucide="${c._iconName}" style="width:12px; height:12px; margin:0 3px;"></i> • ${c._zoneName}${restoIcon}
                     </div>
                 </div>
