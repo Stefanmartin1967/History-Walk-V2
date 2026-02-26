@@ -196,6 +196,32 @@ function setupAdminListeners() {
         });
     }
 
+    // --- NOUVEAU : Bouton Data Manager ---
+    if (menuContent) {
+        let btnDataManager = document.getElementById('btn-admin-datamanager');
+        if (!btnDataManager) {
+             btnDataManager = document.createElement('button');
+             btnDataManager.id = 'btn-admin-datamanager';
+             btnDataManager.className = 'tools-menu-item';
+             btnDataManager.innerHTML = `<i data-lucide="table"></i> Data Manager`;
+
+             // Insérer après Scout
+             if (btnScout && btnScout.parentNode === menuContent) {
+                 menuContent.insertBefore(btnDataManager, btnScout.nextSibling);
+             } else {
+                 menuContent.prepend(btnDataManager);
+             }
+             createIcons({ icons, root: btnDataManager });
+        }
+
+        // Listener
+        const newBtnDM = btnDataManager.cloneNode(true);
+        btnDataManager.parentNode.replaceChild(newBtnDM, btnDataManager);
+        newBtnDM.addEventListener('click', () => {
+            window.open('history_walk_datamanager/index.html', '_blank');
+        });
+    }
+
     const btnExport = document.getElementById('btn-admin-export-master');
     if (btnExport) {
         btnExport.addEventListener('click', exportMasterGeoJSON);

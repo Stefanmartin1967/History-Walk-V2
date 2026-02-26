@@ -30,7 +30,7 @@ function saveToLocalStorage() {
 
 async function loadZones() {
     try {
-        const response = await fetch('/map.geojson');
+        const response = await fetch(import.meta.env.BASE_URL + 'map.geojson');
         if (response.ok) {
             zonesGeoJSON = await response.json();
             console.log("Zones chargées :", zonesGeoJSON.features.length);
@@ -91,7 +91,7 @@ export async function loadGeoJSON(forceRemote = false) {
         }
 
         if (!dataToLoad) {
-            const response = await fetch('/djerba.geojson?t=' + Date.now());
+            const response = await fetch(import.meta.env.BASE_URL + 'djerba.geojson?t=' + Date.now());
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             dataToLoad = await response.json();
             notify("success", `Chargé : ${dataToLoad.features.length} lieux.`);
