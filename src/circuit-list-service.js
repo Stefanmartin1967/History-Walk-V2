@@ -24,7 +24,7 @@ export function getProcessedCircuits(sortMode = 'date_desc', filterTodo = false,
 
         // Vérification si une version officielle existe déjà
         const existsInOfficial = officialCircuits.some(off =>
-            String(off.id) === String(c.id) ||
+            off.id === c.id ||
             (off.name && c.name && off.name.trim() === c.name.trim())
         );
         return !existsInOfficial;
@@ -36,7 +36,7 @@ export function getProcessedCircuits(sortMode = 'date_desc', filterTodo = false,
     let enrichedCircuits = allCircuits.map(c => {
         // Validation des POIs
         const validPois = (c.poiIds || [])
-            .map(id => state.loadedFeatures.find(f => String(getPoiId(f)) === String(id)))
+            .map(id => state.loadedFeatures.find(f => getPoiId(f) === id))
             .filter(Boolean);
 
         // --- DISTANCE CALCULATION (Unified Logic) ---
@@ -138,7 +138,7 @@ export function getAvailableZonesFromCircuits() {
         if (c.isDeleted) return false;
         if (c.isOfficial) return false;
         const existsInOfficial = officialCircuits.some(off =>
-            String(off.id) === String(c.id) ||
+            off.id === c.id ||
             (off.name && c.name && off.name.trim() === c.name.trim())
         );
         return !existsInOfficial;
@@ -153,7 +153,7 @@ export function getAvailableZonesFromCircuits() {
 
         if (!zoneName) {
             const validPois = (c.poiIds || [])
-                .map(id => state.loadedFeatures.find(f => String(getPoiId(f)) === String(id)))
+                .map(id => state.loadedFeatures.find(f => getPoiId(f) === id))
                 .filter(Boolean);
 
             if (validPois.length > 0) {

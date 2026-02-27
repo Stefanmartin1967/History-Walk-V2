@@ -125,7 +125,8 @@ async function loadOfficialCircuits() {
         state.officialCircuits = officials.map(off => ({
             ...off,
             isOfficial: true,
-            id: off.id || `official_${off.name.replace(/\s+/g, '_')}`
+            id: String(off.id || `official_${off.name.replace(/\s+/g, '_')}`),
+            poiIds: (off.poiIds || []).map(pid => String(pid))
         }));
 
         // Si on est déjà en mode Admin, on déclenche une migration pour mettre à jour les circuits chargés

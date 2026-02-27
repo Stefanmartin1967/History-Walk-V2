@@ -20,8 +20,7 @@ export function isCircuitCompleted(circuit) {
     if (!circuit) return false;
     if (circuit.isOfficial) {
         // Pour les officiels, on regarde dans la carte d'état chargée
-        // FIX: Utilisation de String() pour éviter les mismatches (101 vs "101")
-        return state.officialCircuitsStatus[String(circuit.id)] === true;
+        return state.officialCircuitsStatus[circuit.id] === true;
     } else {
         // Pour les locaux, c'est une propriété directe
         return circuit.isCompleted === true;
@@ -41,10 +40,12 @@ export function notifyCircuitChanged() {
 
 // --- FONCTION CORRIGÉE ---
 export async function setCircuitVisitedState(circuitId, isVisited) {
+    // Sanitization: Ensure ID is a string to match state structure
+    circuitId = String(circuitId);
+
     // 1. Recherche du circuit (Local ou Officiel)
-    // FIX: Recherche robuste avec String()
-    let localCircuit = state.myCircuits.find(c => String(c.id) === String(circuitId));
-    let officialCircuit = state.officialCircuits ? state.officialCircuits.find(c => String(c.id) === String(circuitId)) : null;
+    let localCircuit = state.myCircuits.find(c => c.id === circuitId);
+    let officialCircuit = state.officialCircuits ? state.officialCircuits.find(c => c.id === circuitId) : null;
 
     if (!localCircuit && !officialCircuit) return;
 
@@ -53,7 +54,7 @@ export async function setCircuitVisitedState(circuitId, isVisited) {
         // CORRECTION : Si un circuit est officiel (même s'il a un Shadow local),
         // on DOIT mettre à jour le statut officiel car c'est lui qui est lu par la liste Explorer.
         if (officialCircuit) {
-            state.officialCircuitsStatus[String(circuitId)] = isVisited;
+            state.officialCircuitsStatus[circuitId] = isVisited;
             officialCircuit.isCompleted = isVisited; // Maj en mémoire pour UI immédiate
             await saveAppState(`official_circuits_status_${state.currentMapId}`, state.officialCircuitsStatus);
         }
@@ -424,6 +425,9 @@ export function convertToDraft() {
 }
 
 export async function loadCircuitById(id) {
+    // Sanitization: Ensure ID is a string for strict equality checks
+    id = String(id);
+
     let circuitToLoad = state.myCircuits.find(c => c.id === id);
     if (!circuitToLoad && state.officialCircuits) {
         circuitToLoad = state.officialCircuits.find(c => c.id === id);
@@ -469,7 +473,7 @@ export async function loadCircuitById(id) {
 
                     // FIX: On ajoute le circuit aux "Locaux" (Shadow) pour qu'il soit inclus dans les backups (saveUserData)
                     // Cela permet de restaurer la trace bleue même si le fichier GPX serveur est inaccessible (Offline/Clear DB)
-                    const shadowIndex = state.myCircuits.findIndex(c => String(c.id) === String(id));
+                    const shadowIndex = state.myCircuits.findIndex(c => c.id === id);
                     if (shadowIndex === -1) {
                         // On s'assure que le flag isOfficial est présent pour que l'UI le masque (évite les doublons visuels)
                         if (!circuitToLoad.isOfficial) circuitToLoad.isOfficial = true;
