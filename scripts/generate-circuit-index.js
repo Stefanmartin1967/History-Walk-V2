@@ -355,7 +355,8 @@ function processDirectory(mapId, zones, destinations) {
         let description = '';
 
         // Extract ID
-        const idMatch = content.match(/\[HW-ID:(HW-\d+)\]/);
+        // UPDATE: Support ULID/Alphanumeric IDs (e.g., HW-01KJG...)
+        const idMatch = content.match(/\[HW-ID:(HW-[A-Z0-9]+)\]/);
         if (idMatch) {
             id = idMatch[1];
         }
