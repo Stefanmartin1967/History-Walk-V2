@@ -233,17 +233,6 @@ function setupAdminListeners() {
         btnPublish.addEventListener('click', publishMapToGitHub);
     }
 
-    // --- NOUVEAU : Calibration Carte ---
-    const btnCaptureView = document.getElementById('btn-admin-capture-view');
-    if (btnCaptureView) {
-        btnCaptureView.addEventListener('click', captureCurrentMapView);
-    }
-
-    const btnExportDestinations = document.getElementById('btn-admin-export-destinations');
-    if (btnExportDestinations) {
-        btnExportDestinations.addEventListener('click', exportDestinationsConfig);
-    }
-
     // --- Ajout Dynamique du Bouton RANGS dans le Menu Admin ---
     // menuContent est déjà déclaré plus haut dans la fonction
     if (menuContent) {
@@ -515,67 +504,6 @@ async function publishMapToGitHub() {
         console.error("Erreur publication carte:", error);
         showToast(`Erreur : ${error.message}`, "error");
     }
-}
-
-// --- CALIBRATION CARTE (GOD MODE) ---
-
-function captureCurrentMapView() {
-    if (!map) {
-        showToast("Carte non initialisée.", "error");
-        return;
-    }
-
-    if (!state.currentMapId) {
-        showToast("Aucune carte active identifiée.", "error");
-        return;
-    }
-
-    // --- BLINDAGE DE SÉCURITÉ ---
-    // On s'assure que la structure existe même si le chargement initial a échoué
-    if (!state.destinations) {
-        state.destinations = { activeMapId: state.currentMapId, maps: {} };
-    }
-    if (!state.destinations.maps) {
-        state.destinations.maps = {};
-    }
-    if (!state.destinations.maps[state.currentMapId]) {
-        // Initialisation de la destination courante si nouvelle
-        state.destinations.maps[state.currentMapId] = {
-            name: state.currentMapId.charAt(0).toUpperCase() + state.currentMapId.slice(1),
-            file: `${state.currentMapId}.geojson`
-        };
-    }
-
-    // Récupération des valeurs actuelles
-    const center = map.getCenter();
-    const zoom = map.getZoom();
-
-    // Arrondi pour propreté (5 décimales pour lat/lng, 1 pour zoom)
-    const newCenter = [
-        parseFloat(center.lat.toFixed(5)),
-        parseFloat(center.lng.toFixed(5))
-    ];
-    const newZoom = parseFloat(zoom.toFixed(1));
-
-    // Mise à jour de l'objet state
-    state.destinations.maps[state.currentMapId].startView = {
-        center: newCenter,
-        zoom: newZoom
-    };
-
-    console.log(`[GodMode] Nouvelle vue capturée pour ${state.currentMapId}:`, state.destinations.maps[state.currentMapId].startView);
-    showToast(`Vue mémorisée pour ${state.currentMapId} !`, "success");
-}
-
-function exportDestinationsConfig() {
-    if (!state.destinations) {
-        showToast("Aucune configuration à exporter.", "error");
-        return;
-    }
-
-    const jsonStr = JSON.stringify(state.destinations, null, 2);
-    downloadFile('destinations.json', jsonStr, 'application/json');
-    showToast("destinations.json exporté !", "success");
 }
 
 function showRankTable() {
