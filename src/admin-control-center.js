@@ -827,6 +827,7 @@ function renderTab(tab) {
                             </div>
                             <div class="diff-text">
                                 <h4>${item.name}</h4>
+                                ${item.isCircuit ? `<div style="font-size:0.7rem; color:#94A3B8; font-family:monospace; margin-top:2px;">ID: ${item.id}</div>` : ''}
                                 <p>${changeSummary}</p>
                             </div>
                         </div>
