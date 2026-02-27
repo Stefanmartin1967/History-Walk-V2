@@ -4,7 +4,7 @@ import { downloadFile, getPoiId } from './utils.js';
 import { showToast } from './toast.js';
 import { closeAllDropdowns } from './ui.js';
 import { map } from './map.js';
-import { showAlert } from './modal.js';
+import { showAlert, showConfirm } from './modal.js';
 import { ANIMAL_RANKS } from './statistics.js';
 import { createIcons, icons } from 'lucide';
 import { uploadFileToGitHub, getStoredToken, saveToken } from './github-sync.js';
@@ -777,17 +777,41 @@ export function showGitHubUploadModal() {
         const isAllowed = allowedExtensions.some(ext => fileNameLower.endsWith(ext));
 
         if (!isAllowed) {
-            const userConfirmed = confirm(
-                `⚠️ Fichier non standard détecté\n\n` +
-                `Le fichier "${file.name}" ne semble pas être un circuit (.gpx) ou des données (.json).\n` +
-                `L'envoi de fichiers exécutables ou inconnus peut compromettre la sécurité.\n\n` +
-                `Voulez-vous vraiment continuer l'upload ?`
+            // Utilisation de la modale custom (showConfirm) pour plus d'élégance
+            // Attention: showConfirm remplace le contenu de la modale actuelle.
+            // On doit donc gérer le flux UX : Si annulé, on revient (idéalement) ou on ferme tout.
+            // Ici, on est déjà DANS une modale. showConfirm va écraser le contenu.
+            // C'est un peu brutal mais acceptable pour une alerte de sécurité.
+            // Le mieux serait de restaurer la modale d'upload si annulé, mais pour l'instant on ferme tout si annulé.
+
+            const warningMsg = `
+                <div style="text-align:left; color:var(--ink);">
+                    <p style="margin-bottom:10px;">Le fichier <strong>${file.name}</strong> ne semble pas être un circuit (.gpx) ou des données (.json).</p>
+                    <p style="font-size:0.9em; color:var(--danger);">⚠️ L'envoi de fichiers exécutables ou inconnus peut compromettre la sécurité de l'application.</p>
+                    <p style="margin-top:10px;">Voulez-vous vraiment continuer l'upload ?</p>
+                </div>
+            `;
+
+            const userConfirmed = await showConfirm(
+                "Fichier non standard",
+                warningMsg,
+                "Uploader quand même", // Confirm Label
+                "Annuler",             // Cancel Label
+                true                   // isDanger = true (Red button)
             );
+
             if (!userConfirmed) {
-                statusDiv.textContent = "Upload annulé par l'utilisateur.";
-                statusDiv.style.color = "var(--ink-soft)";
+                // Si l'utilisateur annule, la modale showConfirm s'est fermée.
+                // On pourrait rouvrir la modale d'upload ici si on voulait être très poli,
+                // mais pour une action critique annulée, fermer tout est aussi un bon feedback "Retour à la sécurité".
+                showToast("Upload annulé par sécurité.", "info");
                 return;
             }
+
+            // Si confirmé, on doit rouvrir "virtuellement" le contexte d'upload ou juste continuer ?
+            // showConfirm a fermé la modale. On a perdu le statut "Envoi en cours..." visuel.
+            // On peut réafficher une modale de statut simple.
+            showAlert("Upload en cours", `<div style="text-align:center; padding:20px;"><i data-lucide="loader-2" class="spin" style="width:32px; height:32px;"></i><br>Envoi du fichier exceptionnel...</div>`, null);
         }
 
         // Save token

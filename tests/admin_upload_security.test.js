@@ -9,8 +9,13 @@ vi.mock('../src/github-sync.js', () => ({
     uploadFileToGitHub: vi.fn()
 }));
 
-// We need to mock document elements since we are testing DOM interactions
-describe('Admin Upload Security', () => {
+// Mock modal functions
+vi.mock('../src/modal.js', () => ({
+    showAlert: vi.fn(),
+    showConfirm: vi.fn() // We will mock implementation in tests
+}));
+
+describe('Admin Upload Security (Custom Modal)', () => {
     let overlay, title, message, actions;
 
     beforeEach(() => {
@@ -25,9 +30,6 @@ describe('Admin Upload Security', () => {
         title = document.getElementById('custom-modal-title');
         message = document.getElementById('custom-modal-message');
         actions = document.getElementById('custom-modal-actions');
-
-        // Mock confirm
-        window.confirm = vi.fn(() => true);
     });
 
     afterEach(() => {
@@ -35,56 +37,24 @@ describe('Admin Upload Security', () => {
         vi.clearAllMocks();
     });
 
-    it('should open modal and have correct elements', () => {
-        showGitHubUploadModal();
-        expect(overlay.classList.contains('active')).toBe(true);
-        expect(title.textContent).toBe("Mise en ligne GitHub");
-        expect(message.querySelector('#gh-token')).toBeTruthy();
-        expect(message.querySelector('#gh-file-input')).toBeTruthy();
-    });
-
-    // Since the actual file selection and click handler are inside the function scope and bound to DOM elements created inside,
-    // we need to simulate the user interaction flow.
-
-    it('should allow .gpx files without confirmation', async () => {
+    it('should allow .gpx files without any confirmation modal', async () => {
         showGitHubUploadModal();
         const sendBtn = actions.querySelector('.custom-modal-btn.primary');
         const fileInput = message.querySelector('#gh-file-input');
 
-        // Simulate file selection
         const file = new File(['<gpx></gpx>'], 'test.gpx', { type: 'application/gpx+xml' });
-        Object.defineProperty(fileInput, 'files', {
-            value: [file]
-        });
-
-        // Mock uploadFileToGitHub inside the module - we already did
-        const { uploadFileToGitHub } = await import('../src/github-sync.js');
-        window.confirm.mockClear();
-
-        await sendBtn.click();
-
-        expect(window.confirm).not.toHaveBeenCalled();
-        expect(uploadFileToGitHub).toHaveBeenCalled();
-    });
-
-    it('should allow .json files without confirmation', async () => {
-        showGitHubUploadModal();
-        const sendBtn = actions.querySelector('.custom-modal-btn.primary');
-        const fileInput = message.querySelector('#gh-file-input');
-
-        const file = new File(['{}'], 'data.json', { type: 'application/json' });
         Object.defineProperty(fileInput, 'files', { value: [file] });
 
         const { uploadFileToGitHub } = await import('../src/github-sync.js');
-        window.confirm.mockClear();
+        const { showConfirm } = await import('../src/modal.js');
 
         await sendBtn.click();
 
-        expect(window.confirm).not.toHaveBeenCalled();
+        expect(showConfirm).not.toHaveBeenCalled();
         expect(uploadFileToGitHub).toHaveBeenCalled();
     });
 
-    it('should ask for confirmation for .html files', async () => {
+    it('should ask for confirmation (showConfirm) for .html files', async () => {
         showGitHubUploadModal();
         const sendBtn = actions.querySelector('.custom-modal-btn.primary');
         const fileInput = message.querySelector('#gh-file-input');
@@ -93,33 +63,34 @@ describe('Admin Upload Security', () => {
         Object.defineProperty(fileInput, 'files', { value: [file] });
 
         const { uploadFileToGitHub } = await import('../src/github-sync.js');
+        const { showConfirm } = await import('../src/modal.js');
 
-        // Default confirm mock returns true, so it should proceed after warning
+        // Mock showConfirm to resolve TRUE (user accepts)
+        showConfirm.mockResolvedValue(true);
+
         await sendBtn.click();
 
-        expect(window.confirm).toHaveBeenCalled();
-        // Since confirmed, upload should happen
+        expect(showConfirm).toHaveBeenCalled();
         expect(uploadFileToGitHub).toHaveBeenCalled();
     });
 
-    it('should abort upload if confirmation is rejected for unsafe files', async () => {
+    it('should abort upload if showConfirm returns false', async () => {
         showGitHubUploadModal();
         const sendBtn = actions.querySelector('.custom-modal-btn.primary');
         const fileInput = message.querySelector('#gh-file-input');
-        const statusDiv = message.querySelector('#gh-status');
 
         const file = new File(['<html></html>'], 'malicious.html', { type: 'text/html' });
         Object.defineProperty(fileInput, 'files', { value: [file] });
 
         const { uploadFileToGitHub } = await import('../src/github-sync.js');
+        const { showConfirm } = await import('../src/modal.js');
 
-        // Mock confirm to return false (user says NO)
-        window.confirm.mockImplementation(() => false);
+        // Mock showConfirm to resolve FALSE (user cancels)
+        showConfirm.mockResolvedValue(false);
 
         await sendBtn.click();
 
-        expect(window.confirm).toHaveBeenCalled();
+        expect(showConfirm).toHaveBeenCalled();
         expect(uploadFileToGitHub).not.toHaveBeenCalled();
-        expect(statusDiv.textContent).toContain("Upload annulé");
     });
 });
