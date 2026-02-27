@@ -3498,7 +3498,8 @@ input[type=range] {
     padding: 6px 15px !important;
     width: auto !important; /* Le bouton s'adapte au texte au lieu de prendre toute la largeur */
     margin-bottom: 5px !important; /* Espace entre les deux boutons */
-    min-width: 200px;
+    min-width: 240px; /* Uniformiser largeur */
+    justify-content: center !important; /* Centrer le contenu (icône + texte) */
 }
 
 /* Bouton Exporter (Réduction largeur) */
@@ -3509,7 +3510,8 @@ input[type=range] {
     padding: 6px 15px !important;
     width: auto !important;
     margin-bottom: 0 !important; /* Pour respecter les 5px de padding du conteneur */
-    min-width: 200px;
+    min-width: 240px; /* Uniformiser largeur */
+    justify-content: center !important; /* Centrer le contenu */
 }
 
 .modal-close-x {
