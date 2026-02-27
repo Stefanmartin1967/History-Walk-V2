@@ -693,7 +693,7 @@ function showGitHubConfigModal() {
     overlay.classList.add('active');
 }
 
-function showGitHubUploadModal() {
+export function showGitHubUploadModal() {
     const storedToken = getStoredToken() || '';
     const repoOwner = 'Stefanmartin1967'; // Default from user info
     const repoName = 'History-Walk-V1';   // Default from user info
@@ -769,6 +769,25 @@ function showGitHubUploadModal() {
             statusDiv.textContent = "Erreur: Aucun fichier sélectionné.";
             statusDiv.style.color = "red";
             return;
+        }
+
+        // --- SECURITY CHECK ---
+        const allowedExtensions = ['.gpx', '.json'];
+        const fileNameLower = file.name.toLowerCase();
+        const isAllowed = allowedExtensions.some(ext => fileNameLower.endsWith(ext));
+
+        if (!isAllowed) {
+            const userConfirmed = confirm(
+                `⚠️ Fichier non standard détecté\n\n` +
+                `Le fichier "${file.name}" ne semble pas être un circuit (.gpx) ou des données (.json).\n` +
+                `L'envoi de fichiers exécutables ou inconnus peut compromettre la sécurité.\n\n` +
+                `Voulez-vous vraiment continuer l'upload ?`
+            );
+            if (!userConfirmed) {
+                statusDiv.textContent = "Upload annulé par l'utilisateur.";
+                statusDiv.style.color = "var(--ink-soft)";
+                return;
+            }
         }
 
         // Save token
