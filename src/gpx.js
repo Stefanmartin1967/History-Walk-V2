@@ -122,6 +122,47 @@ function generateAndDownloadGPX(circuit, id, name, description, realTrack = null
     downloadFile(`${name}.gpx`, gpxContent, 'application/gpx+xml');
 }
 
+/**
+ * Calcule les compteurs "Planifié" pour chaque POI de manière optimisée.
+ * @param {Array} features - La liste des POIs chargés (state.loadedFeatures)
+ * @param {Array} circuits - La liste des circuits à analyser
+ * @returns {Object} Un objet { poiId: count }
+ */
+export function computeCircuitCounters(features, circuits) {
+    const counters = {};
+
+    // OPTIMISATION V2 : Création d'une Map pour accès O(1)
+    // Au lieu de features.find() dans la boucle (O(N*M)), on prépare l'index (O(N)).
+    const featureMap = new Map();
+    features.forEach(f => {
+        const id = getPoiId(f);
+        featureMap.set(id, f);
+        counters[id] = 0; // Init à 0
+    });
+
+    const activeCircuits = circuits.filter(c => !c.isDeleted);
+
+    activeCircuits.forEach(circuit => {
+        const poiIds = circuit.poiIds || [];
+        // Set pour éviter de compter 2 fois le même POI dans un même circuit
+        [...new Set(poiIds)].forEach(poiId => {
+            if (counters.hasOwnProperty(poiId)) {
+                // Recherche O(1) grâce à la Map
+                const feature = featureMap.get(poiId);
+
+                // CORRECTION : On ne compte QUE si le POI n'est pas marqué supprimé
+                const isDeleted = feature && feature.properties.userData && feature.properties.userData.deleted;
+
+                if (!isDeleted) {
+                    counters[poiId]++;
+                }
+            }
+        });
+    });
+
+    return counters;
+}
+
 export async function recalculatePlannedCountersForMap(mapId) {
     if (!mapId) return;
     try {
@@ -136,28 +177,8 @@ export async function recalculatePlannedCountersForMap(mapId) {
 
         const allCircuits = [...activeLocalCircuits, ...officialCircuits];
 
-        const counters = {};
-        
-        // Etape 1 : On initialise tout à 0 (même les supprimés s'ils sont chargés)
-        state.loadedFeatures.forEach(f => {
-            counters[getPoiId(f)] = 0;
-        });
-
-        allCircuits.forEach(circuit => {
-            const poiIds = circuit.poiIds || [];
-            [...new Set(poiIds)].forEach(poiId => {
-                // Etape 2 : On vérifie l'existence et l'état du POI
-                if (counters.hasOwnProperty(poiId)) {
-                    const feature = state.loadedFeatures.find(f => getPoiId(f) === poiId);
-                    // CORRECTION : On ne compte QUE si le POI n'est pas marqué supprimé
-                    const isDeleted = feature && feature.properties.userData && feature.properties.userData.deleted;
-                    
-                    if (!isDeleted) {
-                        counters[poiId]++;
-                    }
-                }
-            });
-        });
+        // APPEL DE LA FONCTION OPTIMISÉE
+        const counters = computeCircuitCounters(state.loadedFeatures, allCircuits);
 
         const updatesToBatch = [];
         for (const [poiId, count] of Object.entries(counters)) {
