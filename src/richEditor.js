@@ -522,8 +522,15 @@ async function executeEdit(data) {
     await logModification(poiId, logType, 'All', null, `Mise à jour via Rich Editor`);
 
     // Force le rafraîchissement des marqueurs Leaflet avec la nouvelle catégorie
+    // On importe data.js, puis on force l'application des filtres qui va émettre 'data:filtered'
+    // ce qui redessinera complètement les points sur la carte
     const { applyFilters } = await import('./data.js');
     applyFilters();
+
+    // De plus, on s'assure que refreshMapMarkers est appelé avec les features filtrées
+    const { getFilteredFeatures } = await import('./data.js');
+    const { refreshMapMarkers } = await import('./map.js');
+    refreshMapMarkers(getFilteredFeatures());
 
     // Force le rafraîchissement de l'interface si le panneau est ouvert
     if (state.currentFeatureId !== null) {
