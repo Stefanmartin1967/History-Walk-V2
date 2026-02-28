@@ -6931,26 +6931,6 @@
         "Description": "Ajouté via Rich Editor",
         "planifieCounter": 0
       }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          10.792898547439492,
-          33.858449182897346
-        ]
-      },
-      "properties": {
-        "Nom du site FR": "Test console suppression",
-        "Catégorie": "Culture et tradition",
-        "Zone": "Houmt Souk",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0,
-        "HW_ID": "HW-01KJGA38WWJFJG3V4Q8N7B2JHN",
-        "Description": "Ajouté via Rich Editor"
-      }
     }
   ]
 }
