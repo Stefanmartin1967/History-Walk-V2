@@ -4,6 +4,7 @@ import { showAlert } from './modal.js';
 import { createIcons, icons } from 'lucide';
 import { uploadFileToGitHub, getStoredToken } from './github-sync.js';
 import { showToast } from './toast.js';
+import { escapeHtml } from './utils.js';
 
 let originalData = null;
 let currentPendingChanges = { newPois: [], gpsUpdates: [], contentUpdates: [], deletes: [] };
@@ -37,51 +38,101 @@ export async function openAdminFusionConsole() {
         </div>
     `;
 
-    // Inject Custom Styles for Fusion ++
+    // Inject Custom Styles for Fusion ++ (Matching original fusion.html)
     if (!document.getElementById('fusion-plus-styles')) {
         const style = document.createElement('style');
         style.id = 'fusion-plus-styles';
         style.textContent = `
-            .fusion-group-title { font-weight:800; font-size:1rem; margin:20px 0 10px 0; display:flex; align-items:center; gap:10px; }
-            .fusion-badge { padding:2px 8px; border-radius:20px; font-size:0.75rem; font-weight:bold; color:white; }
-            .fusion-badge.new { background:#10B981; }
-            .fusion-badge.gps { background:#3B82F6; }
-            .fusion-badge.content { background:#F59E0B; }
-            .fusion-badge.del { background:#EF4444; }
+            /* Variables de base de fusion.html */
+            :root {
+                --bg: #0D3B66;
+                --surface: #FFFFFF;
+                --surface-alt: #F8FAFC;
+                --ink: #102A43;
+                --ink-light: #64748B;
+                --brand: #3B82F6;
+                --ok: #10B981;
+                --warn: #F59E0B;
+                --danger: #EF4444;
+                --border: #E2E8F0;
+            }
 
-            .fusion-item { background:white; border:1px solid #E2E8F0; border-radius:12px; margin-bottom:10px; display:flex; padding:15px; gap:15px; transition:0.2s; }
-            .fusion-item:hover { border-color:#CBD5E1; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+            #fusion-plus-container {
+                font-family: system-ui, sans-serif;
+                background-color: #F1F5F9;
+                color: var(--ink);
+            }
 
-            .fusion-checkbox { width:20px; height:20px; cursor:pointer; accent-color:var(--amber); margin-top:2px; }
-            .fusion-item-body { flex:1; }
+            .fusion-group-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-top: 20px; margin-bottom: 10px; color: var(--ink); }
 
-            .fusion-item-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5px; }
-            .fusion-poi-name { font-weight:700; font-size:1rem; margin:0; }
+            .fusion-badge { padding: 4px 8px; border-radius: 99px; font-size: 12px; font-weight: 700; }
+            .fusion-badge.new { background: #DBEAFE; color: #1E40AF; }
+            .fusion-badge.gps { background: #FEF3C7; color: #92400E; }
+            .fusion-badge.content { background: #D1FAE5; color: #065F46; }
+            .fusion-badge.del { background: #FEE2E2; color: #991B1B; }
 
-            .fusion-change-row { display:flex; align-items:center; gap:8px; font-size:0.85rem; margin-top:5px; padding-top:5px; border-top:1px dashed #F1F5F9; }
-            .fusion-old-val { color:#94A3B8; text-decoration:line-through; }
-            .fusion-new-val { color:#166534; font-weight:600; background:#F0FDF4; padding:0 4px; border-radius:4px; }
+            .fusion-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; gap: 15px; align-items: flex-start; transition: border-color 0.2s; }
+            .fusion-item:hover { border-color: var(--brand); }
 
-            .btn-edit-poi { background:transparent; border:1px solid #E2E8F0; color:#64748B; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:0.75rem; display:flex; align-items:center; gap:4px; }
+            .fusion-checkbox { width: 18px; height: 18px; cursor: pointer; margin-top:2px; }
+
+            .fusion-item-body { flex-grow: 1; }
+
+            .fusion-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+            .fusion-poi-name { font-weight: 700; font-size: 16px; margin: 0; }
+
+            .fusion-change-row { font-size: 14px; color: var(--ink-light); display: flex; gap: 10px; align-items: center; margin-top: 6px; background: var(--surface-alt); padding: 8px; border-radius: 6px; }
+            .fusion-old-val { text-decoration: line-through; color: #94A3B8; font-size: 12px; }
+            .fusion-new-val { color: var(--ink); font-weight: 500; }
+
+            .btn-edit-poi { background:transparent; border:1px solid var(--border); color:var(--ink-light); padding:4px 8px; border-radius:6px; cursor:pointer; font-size:12px; display:flex; align-items:center; gap:4px; font-weight: 500;}
             .btn-edit-poi:hover { background:#F1F5F9; color:var(--ink); }
+
+            /* Inputs pour Nouveaux Lieux */
+            .fusion-new-poi-input { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; box-sizing: border-box; font-size: 14px; margin-top: 4px; }
+            .fusion-new-poi-input[dir="rtl"] { direction: rtl; text-align: right; }
         `;
         document.head.appendChild(style);
     }
 
-    // Open Modal
+    // Ensure we are displaying properly in the standard UI
+    const existing = document.getElementById('custom-modal-overlay');
+    if (existing) {
+        existing.classList.remove('active');
+    }
+
+    // Ensure we are displaying properly in the standard UI
+    const existing = document.getElementById('custom-modal-overlay');
+    if (existing) {
+        existing.classList.remove('active');
+    }
+
+    // Open Modal via standard mechanism
     showAlert("", html, null, 'fusion-plus-modal');
 
-    // Hide default title/actions
-    const titleEl = document.getElementById('custom-modal-title');
-    if (titleEl) titleEl.style.display = 'none';
-    const actionsEl = document.getElementById('custom-modal-actions');
-    if (actionsEl) actionsEl.style.display = 'none';
+    // Adjust modal styling post-render
+    setTimeout(() => {
+        const titleEl = document.getElementById('custom-modal-title');
+        if (titleEl) titleEl.style.display = 'none';
+        const actionsEl = document.getElementById('custom-modal-actions');
+        if (actionsEl) actionsEl.style.display = 'none';
 
-    // Override padding
-    const box = document.querySelector('.custom-modal-box.fusion-plus-modal');
-    if (box) box.style.padding = '0';
+        // Override padding & height for consistency with original fusion
+        const box = document.querySelector('.custom-modal-box.fusion-plus-modal');
+        if (box) {
+            box.style.padding = '0';
+            box.style.width = '100%';
+            box.style.maxWidth = '900px'; // Align with fusion width
+            box.style.height = '85vh';
+            box.style.display = 'flex';
+            box.style.flexDirection = 'column';
+        }
 
-    createIcons({ icons, root: document.getElementById('fusion-plus-container') });
+        const container = document.getElementById('fusion-plus-container');
+        if(container) {
+            createIcons({ icons, root: container });
+        }
+    }, 50);
 
     await analyzeData();
 }
@@ -262,16 +313,23 @@ function renderDashboard() {
         `;
     };
 
-    html += renderSection('Nouveaux Lieux', newPois, 'new', 'plus-circle', (item) => `
-        <div style="font-size:0.85rem; color:#64748B; margin-top:5px;">
-            Sera ajouté à la carte officielle.
+    html += renderSection('Nouveaux Lieux à Créer', newPois, 'new', 'plus-circle', (item, idx) => `
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+            <div>
+                <label style="font-size:11px; color:var(--ink-light); font-weight:600;">Nom FR</label>
+                <input type="text" class="fusion-new-poi-input" id="fusion-name-new-${idx}" value="${escapeHtml(item.name)}">
+            </div>
+            <div>
+                <label style="font-size:11px; color:var(--ink-light); font-weight:600;">Nom AR (Optionnel)</label>
+                <input type="text" class="fusion-new-poi-input" id="fusion-name-ar-new-${idx}" placeholder="الاسم بالعربية" dir="rtl">
+            </div>
         </div>
     `);
 
     html += renderSection('Corrections GPS', gpsUpdates, 'gps', 'map-pin', (item) => `
         <div class="fusion-change-row">
             <span class="fusion-old-val">[${item.oldCoords[0].toFixed(5)}, ${item.oldCoords[1].toFixed(5)}]</span>
-            <i data-lucide="arrow-right" style="width:14px;height:14px;color:#94A3B8;"></i>
+            <span style="color:var(--brand); font-weight:bold;">➜</span>
             <span class="fusion-new-val">[${item.newCoords[0].toFixed(5)}, ${item.newCoords[1].toFixed(5)}]</span>
         </div>
     `);
@@ -279,19 +337,13 @@ function renderDashboard() {
     html += renderSection('Modifications Contenu', contentUpdates, 'content', 'file-edit', (item) => {
         return item.changes.map(c => `
             <div class="fusion-change-row">
-                <strong style="width:80px;">${c.displayKey}</strong>
-                <span class="fusion-old-val">${c.old}</span>
-                <i data-lucide="arrow-right" style="width:14px;height:14px;color:#94A3B8;"></i>
-                <span class="fusion-new-val">${c.new}</span>
+                <span class="fusion-badge content" style="margin-right:8px; display:inline-block; min-width:60px; text-align:center;">${c.displayKey}</span>
+                <span class="fusion-new-val" style="background:transparent;">${c.new}</span>
             </div>
         `).join('');
     });
 
-    html += renderSection('Suppressions', deletes, 'del', 'trash-2', (item) => `
-        <div style="font-size:0.85rem; color:#EF4444; margin-top:5px;">
-            Sera supprimé définitivement de la carte.
-        </div>
-    `);
+    html += renderSection('Suppressions', deletes, 'del', 'trash-2', (item) => ``);
 
     container.innerHTML = html;
     createIcons({ icons, root: container });
