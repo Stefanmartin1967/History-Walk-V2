@@ -267,24 +267,6 @@
     ]
   },
   {
-    "id": "HW-01KJG6SC8BJ1Z2Y1B6VT4T1NYY",
-    "name": "Circuit de Mosquée Turkiya à Mosquee Ouchachna via Mosquée El Mahri",
-    "file": "djerba/Circuit de Mosquée Turkiya à Mosquee Ouchachna via Mosquée El Mahri.gpx",
-    "description": "Circuit généré par History Walk.",
-    "distance": "6.4 km",
-    "isOfficial": true,
-    "hasRealTrack": true,
-    "zone": "El May",
-    "poiIds": [
-      "HW-01K77WPE6ECJK1CMJKYVNTKGGS",
-      "HW-01K77WPE6EPM3A4QJN2D566KZ5",
-      "HW-01K77WPE6DT0F6KA225EP7PSK9",
-      "HW-01K77WPE6DN850VCNS22C48QFT",
-      "HW-01K77WPE6DWEFD7GCZ7SCRFQA9",
-      "HW-01K77WPE6E2G25V2R888QZDP0X"
-    ]
-  },
-  {
     "id": "HW-01KJB21G695QTYPJYJ4XYW7QHE",
     "name": "Circuit de Mosquée Wadran à Restaurant Port D'Aghir via Mosquée Chbêbia",
     "file": "djerba/Circuit de Mosquée Wadran à Restaurant Port D'Aghir via Mosquée Chbêbia.gpx",
