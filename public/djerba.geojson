@@ -6931,6 +6931,27 @@
         "Description": "Ajouté via Rich Editor",
         "planifieCounter": 0
       }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.7809298077671,
+          33.86039375542632
+        ]
+      },
+      "properties": {
+        "Nom du site FR": "Test console suppression",
+        "Catégorie": "Salon de thé",
+        "Zone": "Houmt Souk",
+        "timeH": 0,
+        "timeM": 0,
+        "price": 0,
+        "HW_ID": "HW-01KJK2GG96X25DJWZDMKSD3ABM",
+        "Description": "Ajouté via Rich Editor",
+        "description": "Ajouté via Rich Editor"
+      }
     }
   ]
 }
