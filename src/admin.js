@@ -307,8 +307,12 @@ function setupAdminListeners() {
             btnDeleteFile.className = 'tools-menu-item';
             btnDeleteFile.innerHTML = `<i data-lucide="trash-2"></i> Delete Fichier`;
 
-            // Insert just after the upload button
-            menuContent.insertBefore(btnDeleteFile, btnControl);
+            // SECURITY CHECK: Verify parent before insert
+            if (btnControl && btnControl.parentNode === menuContent) {
+                menuContent.insertBefore(btnDeleteFile, btnControl);
+            } else {
+                menuContent.appendChild(btnDeleteFile);
+            }
             createIcons({ icons, root: btnDeleteFile });
         }
 
