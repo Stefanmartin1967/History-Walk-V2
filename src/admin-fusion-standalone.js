@@ -139,7 +139,8 @@ function analyzeData() {
             'notes': 'Notes_internes',
             'price': "Prix d'entrée",
             'timeH': 'Temps de visite',
-            'timeM': 'Temps de visite'
+            'timeM': 'Temps de visite',
+            'Catégorie': 'Catégorie'
         };
 
         const processedTime = { timeH: false, timeM: false };
