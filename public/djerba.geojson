@@ -6931,6 +6931,27 @@
         "Description": "Ajouté via Rich Editor",
         "planifieCounter": 0
       }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.78857421875,
+          33.87526144934054
+        ]
+      },
+      "properties": {
+        "Nom du site FR": "Test console suppression",
+        "Catégorie": "Hôtel",
+        "Zone": "Houmt Souk",
+        "Description_courte": "Juste pour voir si Jules me voit na na nère",
+        "timeH": 0,
+        "timeM": 0,
+        "price": 0,
+        "HW_ID": "HW-01KJJZA6EWDCPKZJJA2EFNFREV",
+        "Description": "Ajouté via Rich Editor"
+      }
     }
   ]
 }
