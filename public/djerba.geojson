@@ -6916,36 +6916,6 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          10.780409427781358,
-          33.8558563506458
-        ]
-      },
-      "properties": {
-        "Nom du site FR": "Test pour Jules",
-        "Catégorie": "Hôtel",
-        "Zone": "Houmt Souk",
-        "Description_courte": "Juste pour voir si Jules me voit na na nère",
-        "description": "A effacer ensuite",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0,
-        "HW_ID": "HW-01KJABRN0ZCVE5VKXRGBP9KCJ2",
-        "Description": "Ajouté via Rich Editor",
-        "lat": 33.8558563506458,
-        "lng": 10.780409427781358,
-        "Nom du site arabe": "",
-        "notes": "",
-        "Source": "",
-        "photos": [
-          "photos/poi_HW-PC-1771838835356_1771880218342.jpg"
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
           10.959853573615282,
           33.76392958395882
         ]
