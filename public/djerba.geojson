@@ -6916,26 +6916,6 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          10.769282853548152,
-          33.873872343811016
-        ]
-      },
-      "properties": {
-        "Nom du site FR": "aaaaa",
-        "Catégorie": "Café",
-        "Zone": "Houmt Souk",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0,
-        "HW_ID": "HW-01KJABRN0YEG4779E7NN2GFE7D",
-        "Description": "Ajouté via Rich Editor"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
           10.780409427781358,
           33.8558563506458
         ]
