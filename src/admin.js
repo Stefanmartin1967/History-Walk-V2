@@ -278,13 +278,13 @@ function setupAdminListeners() {
         btnControl.parentNode.replaceChild(newControlBtn, btnControl);
         newControlBtn.addEventListener('click', openControlCenter);
 
-        // --- RESTAURATION : Bouton Upload Fichier (Pour envoi GPX) ---
+        // --- RESTAURATION : Bouton Upload Circuit (Pour envoi GPX) ---
         let btnUpload = document.getElementById('btn-admin-github-upload');
         if (!btnUpload) {
             btnUpload = document.createElement('button');
             btnUpload.id = 'btn-admin-github-upload';
             btnUpload.className = 'tools-menu-item';
-            btnUpload.innerHTML = `<i data-lucide="upload-cloud"></i> Upload Fichier`;
+            btnUpload.innerHTML = `<i data-lucide="upload-cloud"></i> Upload Circuit`;
 
             // SECURITY CHECK: Verify parent before insert
             if (btnControl && btnControl.parentNode === menuContent) {
@@ -299,13 +299,13 @@ function setupAdminListeners() {
         btnUpload.parentNode.replaceChild(newUploadBtn, btnUpload);
         newUploadBtn.addEventListener('click', showGitHubUploadModal);
 
-        // --- NOUVEAU : Bouton Delete Fichier (Pour suppression GPX) ---
+        // --- NOUVEAU : Bouton Delete Circuit (Pour suppression GPX) ---
         let btnDeleteFile = document.getElementById('btn-admin-github-delete');
         if (!btnDeleteFile) {
             btnDeleteFile = document.createElement('button');
             btnDeleteFile.id = 'btn-admin-github-delete';
             btnDeleteFile.className = 'tools-menu-item';
-            btnDeleteFile.innerHTML = `<i data-lucide="trash-2"></i> Delete Fichier`;
+            btnDeleteFile.innerHTML = `<i data-lucide="trash-2"></i> Delete Circuit`;
 
             // SECURITY CHECK: Verify parent before insert
             if (btnControl && btnControl.parentNode === menuContent) {
@@ -319,6 +319,31 @@ function setupAdminListeners() {
         const newDeleteBtn = btnDeleteFile.cloneNode(true);
         btnDeleteFile.parentNode.replaceChild(newDeleteBtn, btnDeleteFile);
         newDeleteBtn.addEventListener('click', showGitHubDeleteModal);
+
+        // --- NOUVEAU : Bouton Console Fusion ++ ---
+        let btnFusionPlus = document.getElementById('btn-admin-fusion-plus');
+        if (!btnFusionPlus) {
+            btnFusionPlus = document.createElement('button');
+            btnFusionPlus.id = 'btn-admin-fusion-plus';
+            btnFusionPlus.className = 'tools-menu-item';
+            btnFusionPlus.innerHTML = `<i data-lucide="git-merge"></i> Console Fusion ++`;
+
+            // On l'insère juste après Delete Circuit
+            if (btnControl && btnControl.parentNode === menuContent) {
+                menuContent.insertBefore(btnFusionPlus, btnControl);
+            } else {
+                menuContent.appendChild(btnFusionPlus);
+            }
+            createIcons({ icons, root: btnFusionPlus });
+        }
+
+        const newFusionBtn = btnFusionPlus.cloneNode(true);
+        btnFusionPlus.parentNode.replaceChild(newFusionBtn, btnFusionPlus);
+        // We will define this later or import it
+        newFusionBtn.addEventListener('click', () => {
+            // Lazy load to avoid circular dependencies if needed, or import at top
+            import('./admin-fusion.js').then(module => module.openAdminFusionConsole());
+        });
 
         // Nettoyage des anciens boutons s'ils existent (Migration)
         ['btn-admin-config-github', 'btn-admin-publish-map'].forEach(id => {
