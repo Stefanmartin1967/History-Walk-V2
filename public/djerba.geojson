@@ -6937,8 +6937,8 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          10.78857421875,
-          33.87526144934054
+          10.794459687396762,
+          33.87054802584056
         ]
       },
       "properties": {
@@ -6950,6 +6950,27 @@
         "timeM": 0,
         "price": 0,
         "HW_ID": "HW-01KJJZA6EWDCPKZJJA2EFNFREV",
+        "Description": "Ajouté via Rich Editor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.78066961777423,
+          33.86363461123823
+        ]
+      },
+      "properties": {
+        "Nom du site FR": "Test console suppression 3",
+        "Catégorie": "Puits",
+        "Zone": "Houmt Souk",
+        "Description_courte": "A effacer",
+        "timeH": 0,
+        "timeM": 0,
+        "price": 0,
+        "HW_ID": "HW-01KJJZDQVMGZEH8PWP97HEHBJQ",
         "Description": "Ajouté via Rich Editor"
       }
     }
