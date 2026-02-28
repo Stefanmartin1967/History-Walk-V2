@@ -101,12 +101,6 @@ export async function openAdminFusionConsole() {
         existing.classList.remove('active');
     }
 
-    // Ensure we are displaying properly in the standard UI
-    const existing = document.getElementById('custom-modal-overlay');
-    if (existing) {
-        existing.classList.remove('active');
-    }
-
     // Open Modal via standard mechanism
     showAlert("", html, null, 'fusion-plus-modal');
 
