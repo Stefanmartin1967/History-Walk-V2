@@ -298,20 +298,29 @@ export function renderExplorerList() {
 
     // We calculate based on the rigid window/sidebar constraints to guarantee absolute stability across pages.
     if (sidebar && header && footer && tabs) {
-        // Available space = fixed sidebar height - tabs - header - footer - (padding of container)
-        // Default gap is 10px, padding is 12px (top and bottom) -> ~24px
-        listHeight = sidebar.clientHeight - tabs.clientHeight - header.clientHeight - footer.clientHeight - 24;
+        // Available space = fixed sidebar height - tabs - header - footer
+        listHeight = sidebar.clientHeight - tabs.clientHeight - header.clientHeight - footer.clientHeight;
     } else {
-        // Fallback: window height minus topbar (70px), tabs (~40px), header (~56px), footer (~56px), padding (~24px)
-        listHeight = window.innerHeight - 70 - 40 - 56 - 56 - 24;
+        // Fallback: window height minus topbar (70px), tabs (~40px), header (~56px), footer (~56px)
+        listHeight = window.innerHeight - 70 - 40 - 56 - 56;
     }
 
-    // Item height is roughly 72px (padding 10*2 + border 1 + content height)
-    const itemHeight = 72;
+    // .explorer-list has padding: 12px (top & bottom) -> 24px total padding
+    const availableSpaceForItems = listHeight - 24;
 
-    // Calculate items per page, minimum 8
-    let itemsPerPage = Math.max(1, Math.floor(listHeight / itemHeight));
-    if (itemsPerPage < 3) itemsPerPage = 8;
+    // Item height is roughly 72px (padding 12*2 + border 1*2 + content height).
+    // And .explorer-list has gap: 10px.
+    // Formula for N items: N * itemHeight + (N - 1) * gap <= availableSpace
+    // N * 72 + N * 10 - 10 <= availableSpace
+    // N * 82 <= availableSpace + 10
+    // N = Math.floor((availableSpaceForItems + 10) / 82)
+    const itemHeight = 72;
+    const gap = 10;
+
+    let itemsPerPage = Math.max(1, Math.floor((availableSpaceForItems + gap) / (itemHeight + gap)));
+
+    // Fallback just in case calculations yield 0 or something weird on tiny screens
+    if (itemsPerPage < 3) itemsPerPage = 6;
 
     const totalPages = Math.max(1, Math.ceil(processedCircuits.length / itemsPerPage));
     if (explorerCurrentPage > totalPages) {
