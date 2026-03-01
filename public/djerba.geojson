@@ -6943,16 +6943,17 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          10.847619755316387,
-          33.751551226222006
+          10.846853256225586,
+          33.751408895277756
         ]
       },
       "properties": {
         "Nom du site FR": "Test console suppression",
-        "Catégorie": "Curiosité",
+        "Catégorie": "Mosquée",
         "Zone": "El Groa",
         "HW_ID": "HW-01KJMYSWDNG5QBCRAQEW1JJ9H1",
-        "Description": "Ajouté via Rich Editor"
+        "Description": "Test suppression de la mosquée test",
+        "Prix d'entrée": "5 TND"
       }
     }
   ]
