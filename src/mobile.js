@@ -202,12 +202,20 @@ export function renderMobileCircuitsList() {
     const circuitsToDisplay = getProcessedCircuits(mobileSort, state.filterCompleted, state.activeFilters.zone || null);
 
     // --- CALCULATE PAGINATION ---
-    // Base estimations: Screen height minus mobile-nav (60px), header (~60px), toolbar (~50px), paddings (~20px) = roughly screenHeight - 190px.
-    const availableHeight = window.innerHeight - 190;
-    // Item height is roughly 80px in mobile mode.
-    const itemHeight = 80;
-    let itemsPerPage = Math.max(1, Math.floor(availableHeight / itemHeight));
-    if (itemsPerPage < 3) itemsPerPage = 6;
+    // Base estimations: Screen height minus mobile-nav (60px), header (~60px), toolbar (~50px), padding-top (~10px), padding-bottom (~100px safe area) = roughly screenHeight - 280px.
+    const availableHeight = window.innerHeight - 280;
+
+    // Item height is roughly 75px.
+    // Margin-bottom is 8px.
+    // N * 75 + (N - 1) * 8 <= availableHeight
+    // N * 83 <= availableHeight + 8
+    const itemHeight = 75;
+    const gap = 8;
+
+    let itemsPerPage = Math.max(1, Math.floor((availableHeight + gap) / (itemHeight + gap)));
+
+    // Fallback
+    if (itemsPerPage < 3) itemsPerPage = 5;
 
     const totalPages = Math.max(1, Math.ceil(circuitsToDisplay.length / itemsPerPage));
     if (mobileCurrentPage > totalPages) {
