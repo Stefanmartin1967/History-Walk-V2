@@ -25,13 +25,7 @@
         "Desc_wpt": null,
         "HW_ID": "HW-01K77WPE67RPHVJVH6A0PC0ZWD",
         "planifieCounter": 1,
-        "vu": true,
-        "Description_courte": "",
-        "description": "Très bel hôtel 4 *, si vous voulez manger local, un coin Djerbie est présent à chaque repas. Soirée Djerbienne le dimanche, journée tunisienne le jeudi, avec entre autre un marché tunisien en journée",
-        "notes": "",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0
+        "vu": true
       }
     },
     {
@@ -3259,13 +3253,7 @@
         "Temps de visite": null,
         "Prix d'entrée": null,
         "Desc_wpt": null,
-        "HW_ID": "HW-01K77WPE6GCJG1C7RFFRYEK7B3",
-        "Description_courte": "",
-        "description": "Située à Tarhdimess. Infos à rechercher.",
-        "notes": "",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0
+        "HW_ID": "HW-01K77WPE6GCJG1C7RFFRYEK7B3"
       }
     },
     {
@@ -6741,10 +6729,6 @@
         "Nom du site FR": "Café thé Baklawa",
         "Catégorie": "Salon de thé",
         "Zone": "Houmt Souk",
-        "Description_courte": "Déguster un thé aux fruits secs grillés, leur spacialité",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 6,
         "HW_ID": "HW-01KJABRN0WMXW7CV3JQJJK9EAV",
         "Description": "Ajouté via Rich Editor",
         "planifieCounter": 1,
@@ -6764,9 +6748,6 @@
         "Nom du site FR": "Mosquée Ben Mimoun",
         "Catégorie": "Mosquée",
         "Zone": "Houmt Souk",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0,
         "HW_ID": "HW-01KJABRN0W6KJP2MNXC0GWQJN6",
         "Description": "Ajouté via Rich Editor",
         "planifieCounter": 1,
@@ -6786,10 +6767,6 @@
         "Nom du site FR": "Ancien atelier de tissage",
         "Catégorie": "Culture et tradition",
         "Zone": "Houmt Souk",
-        "description": "Selon les sources locales, il s'agit d'un ancien atelier de tissage",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0,
         "HW_ID": "HW-01KJABRN0WBFCMMFBGZB582PRH",
         "Description": "Ajouté via Rich Editor",
         "planifieCounter": 1,
@@ -6809,11 +6786,6 @@
         "Nom du site FR": "Marché aux poissons de Houmt Souk",
         "Catégorie": "Commerce",
         "Zone": "Houmt Souk",
-        "Description_courte": "Marché aux poissons",
-        "description": "Achetez-y votre poisson avant de le faire griller dans un des restaurants environnants",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0,
         "HW_ID": "HW-01KJABRN0XCGBFRH389WG2S71J",
         "Description": "Ajouté via Rich Editor",
         "planifieCounter": 1,
@@ -6833,10 +6805,6 @@
         "Nom du site FR": "Restaurant MBAREK",
         "Catégorie": "Restaurant",
         "Zone": "Ajim",
-        "Description_courte": "Restaurant de poissons",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0,
         "HW_ID": "HW-01KJABRN0XJDFFSBSRFDN4PGQ4",
         "Description": "Ajouté via Rich Editor",
         "planifieCounter": 2,
@@ -6857,9 +6825,6 @@
         "Nom du site arabe": "جامع الفقيرة",
         "Catégorie": "Mosquée",
         "Zone": "El Groa",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0,
         "HW_ID": "HW-01KJABRN0XK418GNG8GH5KPT4A",
         "Description": "Ajouté via Rich Editor",
         "lat": 33.7812942328873,
@@ -6881,10 +6846,6 @@
         "Nom du site FR": "La Poste de Midoun",
         "Catégorie": "Taxi",
         "Zone": "Midoun",
-        "Description_courte": "Vous trouverez ici un taxi",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0,
         "HW_ID": "HW-01KJABRN0YD2SFB393HG9SRDGW",
         "Description": "Ajouté via Rich Editor",
         "planifieCounter": 1,
@@ -6904,9 +6865,6 @@
         "Nom du site FR": "Mosquée Sidi Mbarak",
         "Catégorie": "Mosquée",
         "Zone": "Houmt Souk",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0,
         "HW_ID": "HW-01KJABRN0Y687FFD0EF2SYPZ3Q",
         "Description": "Ajouté via Rich Editor"
       }
@@ -6924,9 +6882,6 @@
         "Nom du site FR": "Mosquée Toghrouit",
         "Catégorie": "Mosquée",
         "Zone": "Sedouikech",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0,
         "HW_ID": "HW-01KJB1NZSEHQH5M3JRKS72CKRN",
         "Description": "Ajouté via Rich Editor",
         "planifieCounter": 0
@@ -6945,12 +6900,42 @@
         "Nom du site FR": "Test console suppression",
         "Catégorie": "Salon de thé",
         "Zone": "Houmt Souk",
-        "timeH": 0,
-        "timeM": 0,
-        "price": 0,
         "HW_ID": "HW-01KJK2GG96X25DJWZDMKSD3ABM",
-        "Description": "Ajouté via Rich Editor",
-        "description": "Ajouté via Rich Editor"
+        "Description": "Ajouté via Rich Editor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.790296647510702,
+          33.844619834643225
+        ]
+      },
+      "properties": {
+        "Nom du site FR": "Test console suppression 4",
+        "Catégorie": "Pâtisserie",
+        "Zone": "Houmt Souk",
+        "HW_ID": "HW-01KJK58B974670FMV4JTQTR6XG",
+        "Description": "Ajouté via Rich Editor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.914542646022236,
+          33.79916714833331
+        ]
+      },
+      "properties": {
+        "Nom du site FR": "Mosquée El Djafline",
+        "Catégorie": "Mosquée",
+        "Zone": "El May",
+        "HW_ID": "HW-01KJM8X5EEAHXPBF1YNSEA19F1",
+        "Description": "Ajouté via Rich Editor"
       }
     }
   ]
