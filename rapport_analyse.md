@@ -53,22 +53,22 @@ Voici l'ordre de priorité que je vous conseille :
         *   **Solution apportée (chirurgicale et sécurisée)** : Ajout d'une étape de "tri et de regroupement en mémoire" avant l'écriture en base. Les modifications simultanées pour un même lieu sont d'abord fusionnées. Ensuite, la base applique une méthode sécurisée de "lecture avant écriture" (Read-before-write). L'état actuel est consulté, la mise à jour fusionnée y est ajoutée, puis le tout est sauvegardé. La faille d'écrasement aveugle est totalement colmatée.
     2.  **Verrouillage de l'état** : L'ensemble de la Phase 1 (Sécurisation de la base de données et verrouillage de `state.js`) est terminé !
 
-### Phase 2 : Découpage de l'Interface (Priorité Actuelle - En Cours)
-*   **Objectif** : Rendre le code lisible et faciliter les futures modifications visuelles.
-*   **Bilan des Actions Réalisées (Étapes 1 à 3)** :
+### Phase 2 : Découpage de l'Interface (Terminée 🎉)
+*   **Objectif** : Rendre le code lisible et faciliter les futures modifications visuelles en découpant le "God Object" `ui.js`.
+*   **Bilan des Actions Réalisées** :
     *   Extraction réussie des fonctions liées aux Modales vers un nouveau fichier indépendant `src/ui-modals.js` (`showLegendModal`, `openRestoreModal`, `openTrashModal`, `requestSoftDelete`).
     *   Extraction réussie de la logique des Filtres et des Menus vers `src/ui-filters.js` (`populateZonesMenu`, `populateCategoriesMenu`, etc.).
     *   Extraction réussie de la logique d'affichage des détails (Panneau de détails) vers `src/ui-details.js` (`openDetailsPanel`, `closeDetailsPanel`, `adjustTime`, `adjustPrice`, etc.).
-    *   Extraction chirurgicale de l'interface du mode de sélection vers `src/ui-selection.js` (`updateSelectionModeButton`), tout en laissant la logique d'état en sécurité dans `circuit.js`.
-    *   Le fichier principal `ui.js` qui comptait plus de 1000 lignes n'en fait plus que ~340, l'application compile et fonctionne parfaitement.
-*   **Prochaine étape (Recommandation)** : L'extraction de `ui.js` touche à sa fin ! Les derniers éléments importants restants dans `ui.js` concernent l'**initialisation globale du DOM** (`initializeDomReferences`) et quelques utilitaires d'interface disparates.
-    *   **Option A** : Extraire les fonctions utilitaires comme `closeAllDropdowns` et la gestion de la taille des sauvegardes (`updateBackupSizeEstimates`, `formatBytes`) vers un nouveau fichier `src/ui-utils.js`.
-    *   **Option B** : Laisser `ui.js` tel quel pour l'instant (il est devenu très raisonnable en taille et sert de point de montage du DOM) et passer à la **Phase 3 : Refonte de l'Administration**, qui est un gros chantier critique (`admin-control-center.js` est un fichier de +1400 lignes très complexe).
+    *   Extraction chirurgicale de l'interface du mode de sélection vers `src/ui-selection.js` (`updateSelectionModeButton`).
+    *   Extraction finale des fonctions utilitaires (`closeAllDropdowns`, `updateBackupSizeEstimates`, `formatBytes`) vers le fichier **`src/ui-utils.js`**.
+    *   **Résultat** : Le fichier principal `ui.js`, qui comptait initialement plus de 1000 lignes, a été considérablement réduit et rationalisé. Il sert désormais principalement de point d'entrée pour l'initialisation du DOM et des écouteurs globaux. L'application compile et fonctionne parfaitement, la dette technique de l'interface est maitrisée.
 
-### Phase 3 : Refonte de l'Administration (À Venir)
-*   **Objectif** : Fiabiliser la publication des données vers GitHub.
-*   **Actions** :
-    1.  Découper le fichier géant `admin-control-center.js` en séparant la logique de calcul des différences (diff) de l'interface utilisateur de l'administration.
+### Phase 3 : Refonte de l'Administration (Priorité Actuelle - À Faire)
+*   **Objectif** : Fiabiliser la publication des données vers GitHub et rendre l'interface de contrôle maintenable en s'attaquant au dernier grand "God Object" de l'application : `src/admin-control-center.js` (> 1400 lignes).
+*   **Actions Recommandées (Prochaines étapes)** :
+    1.  **Découpage Logique** : Extraire la logique de calcul complexe des différences (le moteur de "diff" qui compare les données locales et distantes) dans un fichier dédié au traitement de la donnée (ex: `src/admin-diff-engine.js`).
+    2.  **Découpage UI** : Isoler la gestion de l'interface utilisateur du Control Center (affichage des tables, des boutons de publication, des modales de brouillon) dans un fichier d'interface (ex: `src/admin-control-ui.js`).
+    3.  **Séparation de la Maintenance** : Les fonctions liées à la maintenance brute (vidage du cache, purge locale) pourraient être séparées du module de publication (Control Center).
 
 ---
 
