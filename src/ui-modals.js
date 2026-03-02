@@ -3,12 +3,12 @@ import { getPoiId, getPoiName } from './data.js';
 import { escapeXml, isMobileView } from './utils.js';
 import { showToast } from './toast.js';
 import { showAlert, showConfirm } from './modal.js';
-import { restoreCircuit, deletePoi } from './circuit.js';
+import { deletePoi } from './data.js';
 import { applyFilters } from './data.js'; // Assuming applyFilters is exported from data.js or wherever it resides.
 import { closeDetailsPanel } from './ui.js';
 import { switchMobileView } from './mobile.js';
 import { eventBus } from './events.js';
-import { saveAppState } from './database.js';
+import { saveAppState, restoreCircuit } from './database.js';
 import { createIcons, icons } from 'lucide';
 
 export function showLegendModal() {
