@@ -46,28 +46,23 @@ Pour retrouver de la vélocité et garantir la stabilité, je ne vous propose pa
 
 Voici l'ordre de priorité que je vous conseille :
 
-### Phase 1 : Sécurisation Absolue des Données (Priorité Haute)
+### Phase 1 : Sécurisation Absolue des Données (Terminée 🎉)
 *   **Objectif** : Stopper les risques de perte de données.
-*   **Statut** : **En cours**. (L'Option B a été réalisée : sécurisation de la base de données terminée).
-*   **Actions réalisées** :
-    *   ✅ Correction de `batchSavePoiData` dans `database.js` : Implémentation d'une logique de lecture avant écriture (read-before-write) pour s'assurer que les données sont fusionnées et non écrasées brutalement lors des sauvegardes par lots.
-    *   ✅ Clarification du flux de chargement initial dans `data.js` : Remplacement de l'écrasement global (`...appStateUserData`) par une fusion profonde (deep merge) par attribut pour éviter la perte silencieuse d'informations (comme les notes utilisateur).
-*   **Prochaine étape à réaliser (Ouvrir un nouveau fil pour ceci) :**
-    *   ⏳ Verrouiller `state.js` : Parcourir tout le code (plus de 10 fichiers) pour remplacer les accès directs à `state.*` par des fonctions de mise à jour dédiées (getters/setters). Cela permettra de tracer les modifications de l'état global de l'application.
+*   **Bilan des Actions Réalisées** :
+    1.  **Sécuriser les écritures en base de données** : Le problème de perte de données lié aux sauvegardes en masse (`batchSavePoiData` dans `src/database.js`) a été résolu. Avant, plusieurs petites mises à jour simultanées (ex: cocher "vu" puis ajouter une note) provoquaient un écrasement des données (la dernière annulant les autres).
+        *   **Solution apportée (chirurgicale et sécurisée)** : Ajout d'une étape de "tri et de regroupement en mémoire" avant l'écriture en base. Les modifications simultanées pour un même lieu sont d'abord fusionnées. Ensuite, la base applique une méthode sécurisée de "lecture avant écriture" (Read-before-write). L'état actuel est consulté, la mise à jour fusionnée y est ajoutée, puis le tout est sauvegardé. La faille d'écrasement aveugle est totalement colmatée.
+    2.  **Verrouillage de l'état** : L'ensemble de la Phase 1 (Sécurisation de la base de données et verrouillage de `state.js`) est terminé !
 
-### Phase 2 : Découpage de l'Interface (Priorité Moyenne)
+### Phase 2 : Découpage de l'Interface (Priorité Actuelle - En Cours)
 *   **Objectif** : Rendre le code lisible et faciliter les futures modifications visuelles.
-*   **Actions** :
-    1.  Casser `src/ui.js` en plusieurs petits fichiers logiques (ex: `ui-filters.js`, `ui-details.js`, `ui-modals.js`).
-    2.  Séparer strictement la "Logique métier" (ex: "Calculer si un lieu est visité") de l'"Affichage" (ex: "Colorer le bouton en vert").
+*   **Prochaine étape** : Casser l'énorme fichier `src/ui.js` (>1000 lignes) en plusieurs petits fichiers logiques (par exemple `ui-filters.js`, `ui-details.js`, `ui-modals.js`), en procédant de manière très chirurgicale et par petites étapes pour ne rien casser à l'affichage ni aux fonctionnalités.
+    *   **Action immédiate** : Extraire les fonctions liées aux Modales (`ui-modals.js`) et aux Filtres (`ui-filters.js`) qui sont les plus sûres à séparer pour commencer.
 
-### Phase 3 : Refonte de l'Administration (Priorité Basse)
+### Phase 3 : Refonte de l'Administration (À Venir)
 *   **Objectif** : Fiabiliser la publication des données vers GitHub.
 *   **Actions** :
     1.  Découper le fichier géant `admin-control-center.js` en séparant la logique de calcul des différences (diff) de l'interface utilisateur de l'administration.
 
 ---
 
-**Conclusion** : L'application fonctionne, ce qui est l'essentiel. Les fondations techniques (Vite, Leaflet, IndexedDB) sont les bonnes. Le problème actuel est un problème d'**organisation du code**.
-
-Souhaitez-vous que je commence par la **Phase 1 (Sécurisation des données)** en verrouillant l'accès à l'état global et en corrigeant les fonctions de sauvegarde de la base de données ?
+**Conclusion** : L'application fonctionne, ce qui est l'essentiel. Les fondations techniques (Vite, Leaflet, IndexedDB) sont les bonnes. Le problème actuel est un problème d'**organisation du code**, que nous sommes en train de résoudre méthodiquement.
