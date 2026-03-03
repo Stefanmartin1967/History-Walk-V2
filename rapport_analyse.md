@@ -97,17 +97,21 @@ Les "tests unitaires" simulant des situations extrêmes ont été écrits pour g
     4.  **Résolution des bugs d'ordre d'initialisation** : L'extraction a mis en évidence l'importance stricte de l'ordre de chargement (attacher les écouteurs d'événements *avant* de charger les données de la carte), ce qui a été corrigé chirurgicalement.
     5.  **Résultat** : `src/main.js` ne fait plus qu'une centaine de lignes et son rôle est clair : initialiser la base de données, configurer les écouteurs via `app-events`, lancer le démarrage via `app-startup`, et vérifier le mode administration.
 
-### Phase 8 : Fiabilisation des Sauvegardes et Imports (Recommandation pour la suite)
-Maintenant que l'architecture globale (UI, État, Moteurs, Démarrage) est saine, la prochaine étape logique est de se concentrer sur la robustesse des données entrantes et sortantes de l'utilisateur.
+### Phase 8 : Fiabilisation des Sauvegardes et Imports (Terminée 🎉)
+*   **Objectif** : Sécuriser les données entrantes et sortantes de l'utilisateur (fichiers de sauvegarde JSON, imports GPX).
+*   **Bilan des Actions Réalisées** :
+    1.  **Sécurisation de l'Importation** : Ajout d'une validation stricte (\`isValidBackup\`) dans \`src/fileManager.js\`. Avant d'importer une sauvegarde, l'application vérifie son intégrité (version, structure des objets). Un fichier corrompu est bloqué avec un message d'erreur, protégeant ainsi la base de données locale.
+    2.  **Fiabilisation de l'Exportation** : Création d'un nettoyeur de données récursif (\`cleanDataForExport\`). Avant la création d'un fichier de sauvegarde, la mémoire est scannée pour purger d'éventuelles valeurs \`null\` ou corrompues, garantissant un export 100% sain.
+    3.  **Nettoyage du Moteur GPX** : Découplage du fichier \`src/gpx.js\`. Les calculs complexes liés aux statistiques des circuits ont été déplacés vers \`src/circuit-actions.js\`. \`gpx.js\` ne gère désormais plus que la lecture et l'écriture pures du format XML.
+
+### Phase 9 : Optimisation des Performances de la Carte (Recommandation pour la suite)
+Maintenant que le code et les données sont robustes, la prochaine étape logique est de s'attaquer aux performances visuelles.
 
 *   **Le besoin actuel** :
-    *   La gestion des fichiers de sauvegarde utilisateurs (`src/fileManager.js` et les exports dans `src/ui-export.js`) a besoin d'être fiabilisée.
-    *   Il faut s'assurer que si l'utilisateur importe un fichier mal formaté ou corrompu, l'application ne plante pas et n'écrase pas ses données saines actuelles.
-
-*   **L'objectif de cette phase (Phase 8)** :
-    *   **Sécuriser l'Importation** : Ajouter des validations strictes lors de l'importation de fichiers de sauvegarde.
-    *   **Fiabiliser l'Exportation** : Garantir que tous les champs (notes, favoris, catégories personnalisées) sont correctement inclus dans les exports.
-    *   **Nettoyer le code lié aux fichiers** : Regrouper et sécuriser les fonctions éparpillées qui traitent les fichiers GPX et JSON.
+    *   Le fichier \`src/map.js\` gère l'affichage de centaines de lieux (POIs). Sur de vieux téléphones, le redessin de la carte lors d'un filtrage peut provoquer des saccades.
+*   **L'objectif de cette phase (Phase 9)** :
+    *   **Clusterisation Intelligente** : Optimiser la façon dont les icônes sont regroupées quand on dézoome (déjà présent via Leaflet.markercluster, mais peut-être affinable).
+    *   **Nettoyage de \`map.js\`** : Séparer la logique de configuration de la carte (Leaflet) de la logique métier (création des popups, gestion des icônes dynamiques).
 
 ---
 
