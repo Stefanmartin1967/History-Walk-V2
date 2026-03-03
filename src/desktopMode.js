@@ -1,7 +1,8 @@
 import L from 'leaflet';
 import { getZonesData } from './circuit-actions.js';
 import { applyFilters } from './data.js';
-import { toggleSelectionMode, clearCircuit } from './circuit.js';
+import { clearCircuit } from './circuit.js';
+import { toggleSelectionMode } from './ui-circuit-editor.js';
 import { map } from './map.js';
 import { addPoiFeature, getPoiId, getPoiName, updatePoiData } from './data.js';
 import { state, setSelectionModeFilters, setActiveFilters, setUserData } from './state.js';

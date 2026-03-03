@@ -44,12 +44,15 @@ import {
 import { showToast } from './toast.js';
 
 import {
-    toggleSelectionMode,
     clearCircuit,
-    setupCircuitEventListeners,
     loadCircuitById,
     loadCircuitDraft
 } from './circuit.js';
+
+import {
+    setupCircuitEventListeners,
+    toggleSelectionMode
+} from './ui-circuit-editor.js';
 
 import { performCircuitDeletion, toggleCircuitVisitedStatus } from './circuit-actions.js';
 
