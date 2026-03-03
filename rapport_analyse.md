@@ -81,6 +81,16 @@ Les "tests unitaires" simulant des situations extrêmes ont été écrits pour g
     2.  **Nettoyage massif** : Plus de 70 occurrences de modifications directes (`state.xxx = yyy`) ont été traquées et remplacées par l'appel aux Setters dans l'intégralité du code source (`main.js`, `circuit.js`, `data.js`, `map.js`, `mobile.js`, etc.).
     3.  **Sécurité des objets imbriqués** : Lors de la modification de propriétés complexes (comme les données utilisateur d'un lieu), le code crée désormais une copie propre avant de l'injecter dans l'état. Cela évite les bugs de réactivité et les écrasements asynchrones.
 
+### Phase 6 : Découplage de l'Éditeur de Circuits (Recommandation pour la suite)
+Le fichier `src/circuit.js` (près de 900 lignes) reste le dernier vestige de la conception monolithique de l'application. Il agit actuellement comme un "God Object" pour la création de parcours, mélangeant trois responsabilités distinctes :
+1.  **La logique spatiale et mathématique** : Calcul des distances orthodromiques, réorganisation des points.
+2.  **La gestion de l'état local et des données** : Sauvegarde des brouillons, chargement depuis la base de données.
+3.  **La manipulation visuelle (UI)** : Modification directe du HTML (affichage/masquage de panneaux, rendu de la liste des points dans le DOM).
+
+*   **L'objectif de cette phase** :
+    *   Extraire toute la logique d'interface utilisateur vers un fichier dédié (par exemple `src/ui-circuit-editor.js`).
+    *   Transformer `circuit.js` en un pur "moteur de règles" qui se contente de valider les points et de calculer les distances, rendant ainsi le code beaucoup plus facile à maintenir et à faire évoluer (ex: ajout de nouvelles fonctionnalités de tracé sans casser l'interface).
+
 ---
 
-**Conclusion** : L'application fonctionne, ce qui est l'essentiel. Les fondations techniques (Vite, Leaflet, IndexedDB) sont les bonnes. La dette technique des deux plus gros "God Objects" (`ui.js` et `admin-control-center.js`) a été entièrement résorbée, et l'état de l'application est désormais protégé et prévisible !
+**Conclusion** : L'application fonctionne, ce qui est l'essentiel. Les fondations techniques (Vite, Leaflet, IndexedDB) sont les bonnes. La dette technique majeure a été massivement réduite, et l'état de l'application est désormais protégé et prévisible ! La phase 6 sera la touche finale pour une architecture parfaitement saine.
