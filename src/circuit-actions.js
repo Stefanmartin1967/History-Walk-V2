@@ -2,10 +2,11 @@
 // circuit-actions.js
 import { state, addMyCircuit, updateMyCircuit, setActiveCircuitId, setHasUnexportedChanges, setUserData } from './state.js';
 import { deleteCircuitById, softDeleteCircuit, getAllPoiDataForMap, getAllCircuitsForMap, batchSavePoiData, getAppState, saveCircuit } from './database.js';
-import { clearCircuit, setCircuitVisitedState, generateCircuitName, computeCircuitCounters } from './circuit.js';
+import { clearCircuit, setCircuitVisitedState, generateCircuitName } from './circuit.js';
 import { applyFilters, getPoiId } from './data.js';
 import { isMobileView } from './mobile.js';
-import { showConfirm, showToast } from './modal.js';
+import { showConfirm } from './modal.js';
+import { showToast } from './toast.js';
 import { generateHWID } from './utils.js';
 import { generateAndDownloadGPX } from './gpx.js';
 import { DOM } from './ui.js';
