@@ -871,7 +871,7 @@ export function renderMobileMenu() {
 }
 
 eventBus.on('admin:mode-toggled', () => {
-    if (currentView === 'menu' && isMobileView()) {
+    if (currentView === 'actions' && isMobileView()) {
         renderMobileMenu();
     }
 });
