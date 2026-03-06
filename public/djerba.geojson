@@ -7007,6 +7007,91 @@
         "HW_ID": "HW-01KJZ4D50T7NQJ187MJ21YDR20",
         "Description": "Ajouté via Rich Editor"
       }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.859861952803211,
+          33.81879349004515
+        ]
+      },
+      "properties": {
+        "Nom du site FR": "Arabesque",
+        "Catégorie": "Pâtisserie",
+        "Zone": "Erriadh",
+        "HW_ID": "HW-01KK1CD2CREMNC3CHCGC44PK80",
+        "Description": "Ajouté via Rich Editor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.853474030156127,
+          33.82993045350589
+        ]
+      },
+      "properties": {
+        "Nom du site FR": "Mosquée de Taghdimus",
+        "Catégorie": "Mosquée",
+        "Zone": "Erriadh",
+        "HW_ID": "HW-01KK1CNPZR005431XS160BZ1C4",
+        "Description": "Ajouté via Rich Editor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.827390776515733,
+          33.83429771914028
+        ]
+      },
+      "properties": {
+        "Nom du site FR": "Mosquée Al-Taqwa",
+        "Catégorie": "Mosquée",
+        "Zone": "Erriadh",
+        "HW_ID": "HW-01KK1CWX2YWAJSWA4NYT64CD4R",
+        "Description": "Ajouté via Rich Editor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.82615065425977,
+          33.83403027422525
+        ]
+      },
+      "properties": {
+        "Nom du site FR": "Massoura",
+        "Catégorie": "Mosquée",
+        "Zone": "Erriadh",
+        "HW_ID": "HW-01KK1D2ZKZRKM1G6011V2WJ9BX",
+        "Description": "Ajouté via Rich Editor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          10.804257094860079,
+          33.825125623614504
+        ]
+      },
+      "properties": {
+        "Nom du site FR": "Mosquée Bazim 2",
+        "Catégorie": "Mosquée",
+        "Zone": "El Groa",
+        "HW_ID": "HW-01KK1D9QR642904GDJN33MDHSK",
+        "Description": "Ajouté via Rich Editor"
+      }
     }
   ]
 }
