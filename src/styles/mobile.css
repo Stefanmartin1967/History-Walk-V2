@@ -187,9 +187,19 @@
 body.mobile-mode .topbar,
 body.mobile-mode #map,
 body.mobile-mode .right-sidebar,
+body.mobile-mode .sidebar-tabs,
+body.mobile-mode .sidebar-panel,
+body.mobile-mode .panel-header,
+body.mobile-mode .panel-footer,
 body.mobile-mode #app-version {
     display: none !important;
 }
+
+/* Force hide generic body direct children that aren't mobile containers or modals */
+body.mobile-mode > div:not(#mobile-container):not(.modal-overlay):not(.custom-modal-overlay):not(#toast-container):not(#photo-viewer) {
+    display: none !important;
+}
+
 body.mobile-mode #mobile-container {
     display: flex !important;
 }
