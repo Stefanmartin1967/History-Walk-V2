@@ -1,0 +1,73 @@
+:root,
+html[data-theme="maritime"] {
+    --spacing-md: 16px;
+    --spacing-item-gap: 12px;
+    --sidebar-width: clamp(380px, 30vw, 480px);
+    --bg: #0D3B66;
+    --bg-2: #062B4D;
+    --surface: #FFFFFF;
+    --surface-muted: #F0F4F8;
+    --ink: #102A43;
+    --ink-soft: #627D98;
+    --line: #D9E2EC;
+    --brand: #3B82F6;
+    --brand-soft: #F0F9FF; /* Plus clair que la mer */
+    --ok: #10B981;
+    --warn: #F59E0B;
+    --danger: #EF4444;
+    --shadow: 0 8px 24px rgba(2, 12, 27, .10), 0 2px 8px rgba(2, 12, 27, .06);
+    --shadow-soft: 0 4px 12px rgba(100, 116, 139, 0.1);
+}
+
+html[data-theme="desert"] {
+    --bg: #4d2c12;
+    --bg-2: #3a210e;
+    --surface: #fff8f0;
+    --surface-muted: #f5efe6;
+    --ink: #3a210e;
+    --ink-soft: #8a6f5e;
+    --line: #e0d5c7;
+    --brand: #e88c32;
+    --brand-soft: #faeadd;
+    --ok: #10B981;
+    --warn: #F59E0B;
+    --danger: #EF4444;
+}
+
+html[data-theme="oasis"] {
+    --bg: #065f46;
+    --bg-2: #054d39;
+    --surface: #f0fdf4;
+    --surface-muted: #e6f7eb;
+    --ink: #064e3b;
+    --ink-soft: #528c7c;
+    --line: #cce8d8;
+    --brand: #34d399;
+    --brand-soft: #d1fae5;
+    --ok: #10B981;
+    --warn: #F59E0B;
+    --danger: #EF4444;
+}
+
+html[data-theme="night"] {
+    --bg: #111827;
+    --bg-2: #000000;
+    --surface: #1f2937;
+    --surface-muted: #374151;
+    --ink: #f3f4f6; /* Plus clair (presque blanc) pour meilleure lisibilité */
+    --ink-soft: #9ca3af;
+    --line: #4b5563;
+    --brand: #60a5fa;
+    --brand-soft: #374151;
+    --ok: #34d399;
+    --warn: #facc15;
+    --danger: #f87171;
+}
+
+/* Force la couleur sur tous les éléments de formulaire et boutons en mode nuit */
+html[data-theme="night"] input,
+html[data-theme="night"] textarea,
+html[data-theme="night"] select,
+html[data-theme="night"] button {
+    color: var(--ink);
+}
