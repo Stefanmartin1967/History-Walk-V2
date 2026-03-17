@@ -1,4 +1,5 @@
 // src/main.js
+import './style.css';
 import { createIcons, icons } from 'lucide';
 
 // --- CORRECTION ICI : On importe parseGps depuis utils.js ---
