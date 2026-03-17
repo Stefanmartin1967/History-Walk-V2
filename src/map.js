@@ -527,13 +527,13 @@ export function fitMapToContent() {
 
         // NOUVEAU : Gestion par BOUNDS (Prioritaire)
         if (config.bounds) {
-            const sidebarWidth = document.body.classList.contains('sidebar-open') ? document.getElementById('right-sidebar').offsetWidth : 0;
-            // paddingBottomRight permet de décaler le centre "utile" vers la gauche pour éviter la sidebar
+            // Le conteneur #map est déjà redimensionné par CSS (right: var(--sidebar-width))
+            // Ajouter un paddingBottomRight décale la carte une seconde fois vers la gauche.
             map.fitBounds(config.bounds, {
-                paddingBottomRight: [sidebarWidth, 0],
+                padding: [20, 20],
                 maxZoom: 18 // Sécurité
             });
-            console.log(`🔎 FIT BOUNDS APPLIQUÉ avec padding droite: ${sidebarWidth}px`);
+            console.log(`🔎 FIT BOUNDS APPLIQUÉ`);
             return;
         }
 
