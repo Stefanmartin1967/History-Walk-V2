@@ -32,7 +32,8 @@ export function updateAppTitle(mapId) {
 
 export async function loadOfficialCircuits() {
     const mapId = state.currentMapId || 'djerba';
-    const circuitsUrl = `./circuits/${mapId}.json`;
+    const baseUrl = import.meta.env?.BASE_URL || './';
+    const circuitsUrl = `${baseUrl}circuits/${mapId}.json`;
 
     let officials = [];
     try {
