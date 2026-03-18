@@ -189,7 +189,6 @@
 /* === FIX SPECIFICITY FOR PC DETAILS PANEL === */
 /* ========================================================= */
 
-
 .btn:hover:not(:disabled) {
     transform: translateY(-1px);
     background: rgba(255, 255, 255, .14);
@@ -275,7 +274,6 @@ body.sidebar-open #map {
     padding: 2px 5px;
     border-radius: 4px;
 }
-
 
 .hw-icon {
     display: flex;
@@ -537,9 +535,6 @@ body.sidebar-open #map {
     flex-shrink: 0;
 }
 
-
-
-
 .editable-field .edit-controls {
     grid-column: 2;
     display: flex;
@@ -550,7 +545,6 @@ body.sidebar-open #map {
 .panel-header .edit-controls {
     margin-left: auto;
 }
-
 
 .header-btn {
     width: 34px;
@@ -766,7 +760,6 @@ textarea.editable-input {
 .circuit-title-container .action-button:hover {
     background: var(--surface-muted);
 }
-
 
 .header-controls {
     display: grid;
@@ -1062,7 +1055,6 @@ textarea.editable-input {
     box-shadow: var(--shadow-soft);
 }
 
-
 .loader-overlay {
     position: fixed;
     top: 0;
@@ -1243,11 +1235,6 @@ textarea.editable-input {
     color: var(--brand);
 }
 
-
-
-
-
-
 .mobile-list {
     padding: 0;
 }
@@ -1293,14 +1280,11 @@ textarea.editable-input {
     margin-left: auto;
 }
 
-
 #mobile-main-container .panel-content {
     padding: 0;
     gap: 0;
     overflow-y: visible; /* Allows sticky elements to work relative to parent scroller */
 }
-
-
 
 .description-section .description-content,
 .notes-section .description-content {
@@ -1402,13 +1386,6 @@ textarea.editable-input {
     outline: none;
 }
 
-
-@media (min-width: 769px) {
-    #mobile-container {
-        display: none !important;
-    }
-}
-
 /* ========================================================= */
 /* === AJOUTS FINS (DESIGN & PATCH 5 BOUTONS) === */
 /* ========================================================= */
@@ -1495,12 +1472,6 @@ textarea.editable-input {
 }
 
 /* 4. La Règle Mobile (SORTIE des accolades ci-dessus) */
-@media (max-width: 800px) {
-    .viewer-content {
-        max-width: 95vw;
-        /* Sur petit écran, on prend presque toute la largeur */
-    }
-}
 
 .close-viewer {
     position: absolute;
@@ -1561,17 +1532,6 @@ textarea.editable-input {
     }
 }
 
-@media only screen and (max-width: 700px) {
-    .viewer-content {
-        width: 100%;
-    }
-
-    .viewer-nav {
-        padding: 10px;
-        font-size: 20px;
-    }
-}
-
 /* --- PATCH POUR LE GÉNÉRATEUR (Design aéré) --- */
 .action-btn-large {
     width: 100%;
@@ -1603,7 +1563,6 @@ input[type=range] {
 #mobile-dock {
     display: none;
 }
-
 
 .mobile-nav-btn {
     background: none;
@@ -2133,7 +2092,6 @@ input[type=range] {
     height: 20px;
 }
 
-
 /* --- PHOTO SELECTION MODAL --- */
 #photo-selection-grid {
     display: grid;
@@ -2238,118 +2196,7 @@ input[type=range] {
 
 /* SAFETY NET FOR MOBILE */
 
-
-
 /* --- CONSOLIDATED MOBILE STYLES (16px Harmonization) --- */
-@media (max-width: 768px) {
-    :root {
-        --spacing-md: 8px;
-    }
-
-    /* 1. Reset Global Layout for Mobile */
-    .topbar,
-    #map,
-    .right-sidebar,
-    #app-version {
-        display: none !important;
-    }
-
-    #mobile-container {
-        display: flex !important;
-        flex-direction: column !important;
-        height: 100dvh;
-        width: 100%;
-        background-color: var(--surface-muted);
-    }
-
-    /* 2. PADDING STRATEGY (Revised: 8px to maximize card width) */
-    .mobile-standard-padding {
-        padding-left: 8px;
-        padding-right: 8px;
-    }
-
-    /* Apply to List and Details Content */
-    .mobile-list,
-    .panel-content,
-    .detail-section .content {
-        padding-left: var(--spacing-md) !important;
-        padding-right: var(--spacing-md) !important;
-        /* Ensure content clears the bottom dock */
-        padding-bottom: calc(90px + env(safe-area-inset-bottom)) !important;
-    }
-
-    /* Exclude Full-Width Elements */
-    .mobile-view-header,
-    .mobile-toolbar,
-    .circuit-info-bar,
-    .detail-section h3 {
-        padding-left: var(--spacing-md);
-        padding-right: var(--spacing-md);
-        /* These often have their own padding, so we just ensure alignment */
-    }
-
-    /* 3. Component Adjustments */
-    .detail-section {
-        margin-bottom: 0; /* Continuous flow */
-        border-radius: 0;
-        border: none;
-        box-shadow: none;
-        border-bottom: 1px solid var(--surface-muted); /* Divider */
-        padding-bottom: 8px;
-    }
-
-    .detail-section:last-child {
-        border-bottom: none;
-    }
-
-    .detail-section h3 {
-        font-size: 13px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        background-color: transparent !important; /* Remove colored header background */
-        border-bottom: none; /* Remove header border */
-        color: var(--brand); /* Use color to distinguish title */
-        padding-top: 12px;
-        padding-bottom: 4px;
-    }
-
-    .title-names {
-        text-align: left;
-    }
-
-    .input-group {
-        gap: 8px;
-    }
-
-    /* 4. Dock & Navigation */
-    #mobile-dock {
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        background: var(--surface-muted);
-        border-top: 1px solid var(--line);
-        box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.03);
-        z-index: 2000;
-        padding-bottom: env(safe-area-inset-bottom);
-    }
-
-    .mobile-nav {
-        display: flex !important;
-        width: 100%;
-        padding: 10px 0;
-        justify-content: space-around;
-    }
-
-    /* 5. Viewer & Modals */
-    .viewer-content {
-        max-width: 95vw;
-    }
-}
 
 /* ==========================================================================
    MOBILE REFACTOR (Safe Append-Only)
@@ -2514,95 +2361,12 @@ input[type=range] {
 }
 
 /* === HARMONISATION MOBILE FINAL (USER REQUEST) === */
-@media (max-width: 768px) {
-    /* 1. Harmonisation Verticale des Conteneurs (Top 10px) */
-    .mobile-list-container,
-    .mobile-poi-list-container,
-    .mobile-actions-container,
-    .mobile-search-container {
-        padding-top: 10px !important;
-    }
-
-    /* 2. Optimisation Largeur : Padding Interne 12px (vs 16px) */
-    .mobile-list-item {
-        padding: 12px !important;
-        border-radius: 12px !important; /* Harmonisation Arrondis */
-    }
-
-    /* Cas spécifique Search Input */
-    .mobile-search-input {
-        border-radius: 12px !important;
-    }
-}
 
 /* === ALIGNEMENT TOOLBAR / DOCK (USER REQUEST) === */
-@media (max-width: 768px) {
-    /* On force la Toolbar à avoir le même padding vertical que le Dock */
-    .mobile-toolbar {
-        padding: 4px 0 !important;
-        justify-content: space-around !important; /* Safety */
-    }
-
-    /* On force les boutons de la Toolbar à se comporter comme ceux du Dock */
-    .toolbar-btn {
-        flex: 1 !important; /* Distribution égale */
-        width: auto !important; /* Overwrite width: 42px */
-        max-width: none !important;
-        padding: 8px 4px !important;
-        height: auto !important; /* Overwrite height: 42px */
-        border-radius: 8px !important; /* Match dock */
-    }
-}
 
 /* === HARMONISATION HEADER/TOOLBAR & LISTE (VERSION 3.5.2) === */
-@media (max-width: 768px) {
-    /* 1. Fusion Visuelle Header / Toolbar */
-    .mobile-view-header {
-        border-bottom: none !important; /* On supprime la ligne de séparation */
-        box-shadow: none !important; /* On supprime l'ombre intermédiaire */
-        padding-bottom: 4px !important; /* On réduit l'espace bas */
-        min-height: auto !important; /* Hauteur naturelle */
-        z-index: 102 !important; /* Au-dessus de la toolbar */
-    }
-
-    .mobile-toolbar {
-        border-top: none !important; /* Pas de bordure haute */
-        box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important; /* Ombre uniquement en bas */
-        padding-top: 0 !important; /* Collé au header */
-        z-index: 101 !important;
-        position: sticky !important;
-        top: 0 !important; /* Si on veut que tout colle */
-        background-color: var(--surface) !important; /* Assurer fond blanc */
-    }
-
-    /* 2. Harmonisation Espacement Liste (Basé sur le plus petit : 8px) */
-    .mobile-list-container {
-        padding-top: 8px !important; /* Remplace le 10px précédent pour matcher margin-bottom: 8px */
-    }
-}
 
 /* === OPTIMISATION PWA & SAFE AREA (VERSION 3.5.3) === */
-@media (max-width: 768px) {
-    /* 1. Gestion du Notch (Encoche) en haut */
-    .mobile-view-header {
-        padding-top: calc(8px + env(safe-area-inset-top)) !important;
-        /* On s'assure que le contenu ne colle pas au status bar */
-    }
-
-    /* 2. Gestion de la Home Bar (Barre du bas) */
-    #mobile-dock {
-        padding-bottom: calc(4px + env(safe-area-inset-bottom)) !important;
-        /* Le dock remonte au-dessus de la barre système */
-    }
-
-    /* 3. Ajustement du padding bas des listes pour éviter d'être caché par le dock agrandi */
-    .mobile-list-container,
-    .mobile-poi-list-container,
-    .mobile-actions-container {
-        padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important;
-    }
-}
-
 
 /* --- LEAFLET CONTROLS HARMONIZATION (THEMED) --- */
 .leaflet-bar a,
@@ -3365,14 +3129,6 @@ input[type=range] {
 }
 
 /* RESPONSIVE: On small PC screens, hide text but keep icon */
-@media (max-width: 1100px) {
-    #btn-bmc-topbar span {
-        display: none;
-    }
-    #btn-bmc-topbar {
-        padding: 0 10px; /* Square-ish aspect */
-    }
-}
 
 /* --- MODALE : COMPACITÉ ET CENTRAGE (Version 5px strict) --- */
 
@@ -3463,21 +3219,254 @@ input[type=range] {
 }
 
 /* --- 7. ADAPTATION MOBILE --- */
+
+/* ========================================================= */
+/* ================== MEDIA QUERIES REGROUPÉES ============= */
+/* ========================================================= */
+
+/* ========================================================= */
+/* ================== MEDIA QUERIES REGROUPÉES ============= */
+/* ========================================================= */
+
+@media (max-width: 1100px) {
+    #btn-bmc-topbar span {
+                display: none;
+            }
+            #btn-bmc-topbar {
+                padding: 0 10px; /* Square-ish aspect */
+            }
+
+}
+
+@media (max-width: 800px) {
+    .viewer-content {
+                max-width: 95vw;
+                /* Sur petit écran, on prend presque toute la largeur */
+            }
+
+}
+
 @media (max-width: 768px) {
-    .custom-modal-box.modal-contribution {
-        width: 85% !important;
-        padding: 10px 10px 5px 10px !important;
-    }
+    :root {
+                --spacing-md: 8px;
+            }
 
-    /* Sur mobile, on garde les boutons larges pour faciliter le clic au doigt */
-    #btn-contrib-bmc, #btn-contrib-export {
-        width: 100% !important;
-        padding: 12px !important;
-    }
+            /* 1. Reset Global Layout for Mobile */
+            .topbar,
+            #map,
+            .right-sidebar,
+            #app-version {
+                display: none !important;
+            }
 
-    .modal-close-x {
-        top: 5px !important;
-        right: 5px !important;
-        padding: 10px !important; /* Larger touch target */
-    }
+            #mobile-container {
+                display: flex !important;
+                flex-direction: column !important;
+                height: 100dvh;
+                width: 100%;
+                background-color: var(--surface-muted);
+            }
+
+            /* 2. PADDING STRATEGY (Revised: 8px to maximize card width) */
+            .mobile-standard-padding {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            /* Apply to List and Details Content */
+            .mobile-list,
+            .panel-content,
+            .detail-section .content {
+                padding-left: var(--spacing-md) !important;
+                padding-right: var(--spacing-md) !important;
+                /* Ensure content clears the bottom dock */
+                padding-bottom: calc(90px + env(safe-area-inset-bottom)) !important;
+            }
+
+            /* Exclude Full-Width Elements */
+            .mobile-view-header,
+            .mobile-toolbar,
+            .circuit-info-bar,
+            .detail-section h3 {
+                padding-left: var(--spacing-md);
+                padding-right: var(--spacing-md);
+                /* These often have their own padding, so we just ensure alignment */
+            }
+
+            /* 3. Component Adjustments */
+            .detail-section {
+                margin-bottom: 0; /* Continuous flow */
+                border-radius: 0;
+                border: none;
+                box-shadow: none;
+                border-bottom: 1px solid var(--surface-muted); /* Divider */
+                padding-bottom: 8px;
+            }
+
+            .detail-section:last-child {
+                border-bottom: none;
+            }
+
+            .detail-section h3 {
+                font-size: 13px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                background-color: transparent !important; /* Remove colored header background */
+                border-bottom: none; /* Remove header border */
+                color: var(--brand); /* Use color to distinguish title */
+                padding-top: 12px;
+                padding-bottom: 4px;
+            }
+
+            .title-names {
+                text-align: left;
+            }
+
+            .input-group {
+                gap: 8px;
+            }
+
+            /* 4. Dock & Navigation */
+            #mobile-dock {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                background: var(--surface-muted);
+                border-top: 1px solid var(--line);
+                box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.03);
+                z-index: 2000;
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+
+            .mobile-nav {
+                display: flex !important;
+                width: 100%;
+                padding: 10px 0;
+                justify-content: space-around;
+            }
+
+            /* 5. Viewer & Modals */
+            .viewer-content {
+                max-width: 95vw;
+            }
+
+        /* 1. Harmonisation Verticale des Conteneurs (Top 10px) */
+            .mobile-list-container,
+            .mobile-poi-list-container,
+            .mobile-actions-container,
+            .mobile-search-container {
+                padding-top: 10px !important;
+            }
+
+            /* 2. Optimisation Largeur : Padding Interne 12px (vs 16px) */
+            .mobile-list-item {
+                padding: 12px !important;
+                border-radius: 12px !important; /* Harmonisation Arrondis */
+            }
+
+            /* Cas spécifique Search Input */
+            .mobile-search-input {
+                border-radius: 12px !important;
+            }
+
+        /* On force la Toolbar à avoir le même padding vertical que le Dock */
+            .mobile-toolbar {
+                padding: 4px 0 !important;
+                justify-content: space-around !important; /* Safety */
+            }
+
+            /* On force les boutons de la Toolbar à se comporter comme ceux du Dock */
+            .toolbar-btn {
+                flex: 1 !important; /* Distribution égale */
+                width: auto !important; /* Overwrite width: 42px */
+                max-width: none !important;
+                padding: 8px 4px !important;
+                height: auto !important; /* Overwrite height: 42px */
+                border-radius: 8px !important; /* Match dock */
+            }
+
+        /* 1. Fusion Visuelle Header / Toolbar */
+            .mobile-view-header {
+                border-bottom: none !important; /* On supprime la ligne de séparation */
+                box-shadow: none !important; /* On supprime l'ombre intermédiaire */
+                padding-bottom: 4px !important; /* On réduit l'espace bas */
+                min-height: auto !important; /* Hauteur naturelle */
+                z-index: 102 !important; /* Au-dessus de la toolbar */
+            }
+
+            .mobile-toolbar {
+                border-top: none !important; /* Pas de bordure haute */
+                box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important; /* Ombre uniquement en bas */
+                padding-top: 0 !important; /* Collé au header */
+                z-index: 101 !important;
+                position: sticky !important;
+                top: 0 !important; /* Si on veut que tout colle */
+                background-color: var(--surface) !important; /* Assurer fond blanc */
+            }
+
+            /* 2. Harmonisation Espacement Liste (Basé sur le plus petit : 8px) */
+            .mobile-list-container {
+                padding-top: 8px !important; /* Remplace le 10px précédent pour matcher margin-bottom: 8px */
+            }
+
+        /* 1. Gestion du Notch (Encoche) en haut */
+            .mobile-view-header {
+                padding-top: calc(8px + env(safe-area-inset-top)) !important;
+                /* On s'assure que le contenu ne colle pas au status bar */
+            }
+
+            /* 2. Gestion de la Home Bar (Barre du bas) */
+            #mobile-dock {
+                padding-bottom: calc(4px + env(safe-area-inset-bottom)) !important;
+                /* Le dock remonte au-dessus de la barre système */
+            }
+
+            /* 3. Ajustement du padding bas des listes pour éviter d'être caché par le dock agrandi */
+            .mobile-list-container,
+            .mobile-poi-list-container,
+            .mobile-actions-container {
+                padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important;
+            }
+
+        .custom-modal-box.modal-contribution {
+                width: 85% !important;
+                padding: 10px 10px 5px 10px !important;
+            }
+
+            /* Sur mobile, on garde les boutons larges pour faciliter le clic au doigt */
+            #btn-contrib-bmc, #btn-contrib-export {
+                width: 100% !important;
+                padding: 12px !important;
+            }
+
+            .modal-close-x {
+                top: 5px !important;
+                right: 5px !important;
+                padding: 10px !important; /* Larger touch target */
+            }
+
+}
+
+@media only screen and (max-width: 700px) {
+    .viewer-content {
+                width: 100%;
+            }
+
+            .viewer-nav {
+                padding: 10px;
+                font-size: 20px;
+            }
+
+}
+
+@media (min-width: 769px) {
+    #mobile-container {
+                display: none !important;
+            }
+
 }
